@@ -50,7 +50,13 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
+    implementation("androidx.compose.material:material-icons-extended")
+    // Coil - Para cargar imágenes desde URI
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    //import para el viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    // Para el manejo de permisos de Accompanist (de Google)
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     //esta línea para la navegación
     implementation("androidx.navigation:navigation-compose:2.7.0")
     androidTestImplementation(libs.androidx.junit)
@@ -73,6 +79,7 @@ dependencies {
         implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
         // Coroutines (si no las tienes)
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
         // DataStore - Para guardar tokens

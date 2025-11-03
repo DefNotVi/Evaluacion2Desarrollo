@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.update
 
+import com.gwagwa.evaluacion2.repository.AvatarRepository // Importación necesaria
+
 /**
  * Estado de la UI
  */
@@ -18,7 +20,7 @@ data class ProfileUiState(
     val userName: String = "",
     val userEmail: String = "",
     val error: String? = null,
-    val avatarUri: Uri? = null  // ✨ Nuevo campo // yay!
+    val avatarUri: Uri? = null
 )
 
 /**
@@ -27,7 +29,11 @@ data class ProfileUiState(
  */
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = UserRepository(application.applicationContext)
+    // Repositorio de la API
+    private val userRepository = UserRepository(application.applicationContext)
+
+    // Repositorio de DataStore para el avatar
+    private val avatarRepository = AvatarRepository(application.applicationContext)
 
     // Estado PRIVADO (solo el ViewModel lo modifica)
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -35,12 +41,26 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     // Estado PÚBLICO (la UI lo observa)
     val uiState: StateFlow<ProfileUiState> = _uiState
 
+    init {
+        // Inicia la observación del URI del avatar guardado en DataStore
+        // Este Flow actualiza automáticamente el estado cada vez que se guarda un nuevo URI.
+        viewModelScope.launch {
+            avatarRepository.getAvatarUri().collect { uri ->
+                _uiState.update { it.copy(avatarUri = uri) }
+            }
+        }
+    }
+
     /**
-     * Actualiza la URI del avatar del usuario.
+     * Actualiza la URI del avatar del usuario y lo guarda en DataStore.
+     * El estado de la UI se actualizará automáticamente gracias al Flow.
      */
     fun updateAvatar(uri: Uri?) {
-        _uiState.update { it.copy(avatarUri = uri) }
+        viewModelScope.launch {
+            avatarRepository.saveAvatarUri(uri)
+        }
     }
+
 
     /**
      * Carga los datos del usuario desde la API
@@ -54,9 +74,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
         // Ejecutar en coroutine (no bloquea la UI)
         viewModelScope.launch {
-            val result = repository.fetchUser(id)
+            val result = userRepository.fetchUser(id)
 
             // Actualizar el estado según el resultado
+            // Nota: Aquí estás usando _uiState.value = result.fold(...) lo cual es correcto.
             _uiState.value = result.fold(
                 onSuccess = { user ->
                     // ✅ Éxito: mostrar datos
