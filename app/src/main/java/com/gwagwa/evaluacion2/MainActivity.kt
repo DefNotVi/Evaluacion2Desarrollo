@@ -3,46 +3,23 @@ package com.gwagwa.evaluacion2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.gwagwa.evaluacion2.ui.theme.Evaluacion2Theme
+import androidx.navigation.compose.rememberNavController
+import com.gwagwa.evaluacion2.ui.navigation.AppNavigation // ⬅️ Importa AppNavigation
+import com.gwagwa.evaluacion2.ui.theme.Evaluacion2Theme // ⬅️ Tu tema
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            Evaluacion2Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            // 1. Obtiene el controlador de navegación
+            val navController = rememberNavController()
+
+            Evaluacion2Theme { // ⬅️ Tu tema principal
+                // 2. Llama al NavHost que maneja la navegación
+                // Ya que AppNavigation ya contiene rememberNavController(),
+                // puedes simplificarlo si lo deseas, o mantenerlo así:
+                AppNavigation()
             }
         }
     }
 }
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Evaluacion2Theme {
-        Greeting("Android")
-    }
-}
-

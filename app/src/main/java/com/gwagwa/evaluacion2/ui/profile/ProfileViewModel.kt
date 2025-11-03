@@ -27,7 +27,7 @@ data class ProfileUiState(
  */
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = UserRepository(application)
+    private val repository = UserRepository(application.applicationContext)
 
     // Estado PRIVADO (solo el ViewModel lo modifica)
     private val _uiState = MutableStateFlow(ProfileUiState())
