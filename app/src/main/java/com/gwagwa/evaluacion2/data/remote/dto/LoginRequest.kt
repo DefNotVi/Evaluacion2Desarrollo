@@ -7,12 +7,9 @@ import com.google.gson.annotations.SerializedName
  * Datos que ENVIAMOS al servidor
  */
 data class LoginRequest(
-    @SerializedName("username")
-    val username: String,
+    @SerializedName("email")
+    val email: String,
 
     @SerializedName("password")
     val password: String,
-
-    @SerializedName("expiresInMins")
-    val expiresInMins: Int = 30  // Token expira en 30 minutos
 )

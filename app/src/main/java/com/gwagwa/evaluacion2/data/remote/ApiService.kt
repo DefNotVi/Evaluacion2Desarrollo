@@ -17,8 +17,12 @@ interface ApiService {
      * val response = apiService.login(LoginRequest("emilys", "emilyspass"))
      * sessionManager.saveAuthToken(response.accessToken)
      */
-    @POST("user/login")
+    @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("auth/signup") // Ruta de Xano
+    suspend fun register(@Body request: RegisterRequest): LoginResponse
+    // Asumimos que la respuesta de registro devuelve un LoginResponse o similar (con token).
 
     /**
      * 👤 OBTENER USUARIO ACTUAL (requiere autenticación)

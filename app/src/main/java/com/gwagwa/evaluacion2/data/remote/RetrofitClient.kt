@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitClient {
 
     // ⚠️ CAMBIA ESTA URL POR LA DE TU API <-- NO SE A CUAL CAMBIARLA SDKLJFHSLKDJ
-    private const val BASE_URL = "https://dummyjson.com/"
+    private const val BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:Rfm_61dW/"
 
     /**
      * Inicializa Retrofit con el contexto de la app
@@ -33,7 +33,7 @@ object RetrofitClient {
         // 4️⃣ OkHttpClient con AMBOS interceptores
         val okHttpClient = OkHttpClient.Builder()
             // ⚠️ ORDEN IMPORTANTE: AuthInterceptor primero, luego Logging <-- ok! no lo toco entonces :>
-            .addInterceptor(authInterceptor)    // Añade el token
+            .addInterceptor(AuthInterceptor(sessionManager))    // Añade el token
             .addInterceptor(loggingInterceptor)  // Muestra en Logcat (con token)
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)

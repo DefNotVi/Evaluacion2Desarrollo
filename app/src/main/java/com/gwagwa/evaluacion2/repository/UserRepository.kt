@@ -1,5 +1,6 @@
 package com.gwagwa.evaluacion2.repository
 
+import com.gwagwa.evaluacion2.data.remote.dto.UsersResponse
 import com.gwagwa.evaluacion2.data.remote.ApiService
 import com.gwagwa.evaluacion2.data.remote.RetrofitClient
 import com.gwagwa.evaluacion2.data.remote.dto.UserDto

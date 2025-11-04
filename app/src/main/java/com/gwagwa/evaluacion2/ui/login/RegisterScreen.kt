@@ -10,16 +10,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit,
+fun RegisterScreen(
+    onRegistrationSuccess: () -> Unit,
+    onNavigateBack: () -> Unit,
     viewModel: LoginViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(state.isLoginSuccess) {
-        if (state.isLoginSuccess) {
-            onLoginSuccess()
+    // Simulación: Si el registro "fue exitoso", navegamos.
+    LaunchedEffect(state.isRegistrationSuccess) {
+        if (state.isRegistrationSuccess) {
+            // En un caso real, deberías navegar al Dashboard.
+            // Aquí te llevo al Login de nuevo para usar un usuario existente.
+            onNavigateBack()
             viewModel.resetState()
         }
     }
@@ -31,19 +34,19 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Iniciar Sesión (TravelGo)", style = MaterialTheme.typography.headlineMedium)
+        Text("Crear Cuenta (Registro)", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo Usuario
+        // Campo Usuario (email)
         OutlinedTextField(
             value = state.username,
             onValueChange = viewModel::updateUsername,
-            label = { Text("usuario") },
+            label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Contraseña (con seguridad)
+        // Campo Contraseña
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::updatePassword,
@@ -58,23 +61,24 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Botón Login
+        // Botón Registro (Simulado)
         Button(
-            onClick = viewModel::login,
+            onClick = viewModel::register,
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
             if (state.isLoading) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
             } else {
-                Text("Ingresar")
+                Text("Registrarme")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Navegar a Registro
-        TextButton(onClick = onNavigateToRegister) {
-            Text("¿No tienes cuenta? Regístrate")
+        // Botón Volver
+        TextButton(onClick = onNavigateBack) {
+            Text("Ya tengo cuenta (Volver a Login)")
         }
     }
 }
+

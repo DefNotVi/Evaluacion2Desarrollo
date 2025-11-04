@@ -29,10 +29,22 @@ class AuthInterceptor(
             sessionManager.getAuthToken()
         }
 
+        // Si hay un token, añade el Header
+        val requestWithAuth = if (token != null) {
+            originalRequest.newBuilder()
+                .header("Authorization", "Bearer $token") // ⬅️ Formato estándar JWT
+                .build()
+        } else {
+            originalRequest
+        }
+
+
         // Si no hay token, continuar con la petición original
         if (token.isNullOrEmpty()) {
             return chain.proceed(originalRequest)
         }
+
+
 
         // Crear nueva petición CON el token
         val authenticatedRequest = originalRequest.newBuilder()
@@ -40,6 +52,8 @@ class AuthInterceptor(
             .build()
 
         // Continuar con la petición autenticada
-        return chain.proceed(authenticatedRequest)
+        return chain.proceed(requestWithAuth)
+
+
     }
 }

@@ -1,5 +1,7 @@
 package com.gwagwa.evaluacion2.ui.components
 
+import com.gwagwa.evaluacion2.ui.theme.Foreground
+import com.gwagwa.evaluacion2.ui.theme.ForegroundMuted
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -14,7 +16,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 // ✅ Importación de tu tema, asumiendo que contiene las constantes de color
-import com.gwagwa.evaluacion2.ui.theme.* @Composable
+import com.gwagwa.evaluacion2.ui.theme.*
+
+@Composable
 fun ImagePickerDialog(
     onDismiss: () -> Unit,
     onCameraClick: () -> Unit,
@@ -58,7 +62,7 @@ fun ImagePickerDialog(
                 )
 
                 // ✅ Reemplazo de ShadcnDivider por Divider de Material 3
-                Divider()
+                HorizontalDivider()
 
                 // Opción de Galería
                 ImagePickerOption(
