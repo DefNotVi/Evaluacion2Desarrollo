@@ -38,12 +38,12 @@ fun LoginScreen(
         OutlinedTextField(
             value = state.username,
             onValueChange = viewModel::updateUsername,
-            label = { Text("usuario") },
+            label = { Text("Usuario (email)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Contraseña (con seguridad)
+        // Campo Contraseña
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::updatePassword,

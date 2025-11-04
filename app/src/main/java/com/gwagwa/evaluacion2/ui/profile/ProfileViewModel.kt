@@ -69,7 +69,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      * Ya no usa Result<T>, por lo que el manejo es directo con try-catch.
      */
     fun loadUser() {
-        // 1. Indicar que está cargando usando .update{}
+        // Indicar que está cargando usando .update{}
         _uiState.update {
             it.copy(isLoading = true, error = null)
         }
@@ -84,14 +84,14 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        // ✅ CORRECCIÓN: Usar los campos del DTO simulado
+                        // Usar los campos del DTO simulado
                         userName = user.username,
                         userEmail = user.email,
                         error = null
                     )
                 }
             } catch (exception: Exception) {
-                // FALLO SIMULADO: En una simulación, esto es poco probable, pero es una buena práctica.
+                // FALLO SIMULADO: con creo que pase pero por si acaso jskldfh, igual me sirve en caso de cualquier cosa so
                 _uiState.update {
                     it.copy(
                         isLoading = false,

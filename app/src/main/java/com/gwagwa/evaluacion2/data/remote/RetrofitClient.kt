@@ -10,29 +10,29 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    // ⚠️ CAMBIA ESTA URL POR LA DE TU API <-- NO SE A CUAL CAMBIARLA SDKLJFHSLKDJ
+    // ⚠️ CAMBIA ESTA URL POR LA DE TU API <-- ya la cambié :D
     private const val BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:Rfm_61dW/"
 
     /**
      * Inicializa Retrofit con el contexto de la app
      * Llamar desde Application o ViewModel al inicio
      */
-// ...
     fun create(context: Context): Retrofit {
 
-        // 1️⃣ SessionManager
+        //  SessionManager
         val sessionManager = SessionManager(context)
 
-        // 2️⃣ AuthInterceptor
+        // AuthInterceptor
         val authInterceptor = AuthInterceptor(sessionManager)
 
-        // 3️⃣ HttpLoggingInterceptor
+        // HttpLoggingInterceptor
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        // 4️⃣ OkHttpClient: Orden recomendado
+        // OkHttpClient (muestra cositas en el logcat :O)
         val okHttpClient = OkHttpClient.Builder()
+            // ⚠️ ORDEN IMPORTANTE: AuthInterceptor primero, luego Logging <-- ok! no lo toco entonces :>
             // Logging primero (para ver la request modificada por AuthInterceptor)
             .addInterceptor(loggingInterceptor)
             // Inyección del token
@@ -41,7 +41,7 @@ object RetrofitClient {
             .readTimeout(20, TimeUnit.SECONDS)
             .build()
 
-        // 5️⃣ Retrofit con el cliente configurado
+        // Retrofit con el cliente configurado
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

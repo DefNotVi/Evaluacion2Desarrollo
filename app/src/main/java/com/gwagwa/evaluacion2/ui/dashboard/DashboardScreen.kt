@@ -22,7 +22,7 @@ fun DashboardScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text("TravelGo SPA: Dashboard", style = MaterialTheme.typography.headlineMedium)
-        Text("¡Autenticación Exitosa!", style = MaterialTheme.typography.bodyLarge)
+        Text("Autenticación Exitosa!", style = MaterialTheme.typography.bodyLarge)
 
         Spacer(modifier = Modifier.height(32.dp))
 

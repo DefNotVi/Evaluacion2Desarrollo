@@ -41,7 +41,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.username,
             onValueChange = viewModel::updateUsername,
-            label = { Text("Usuario") },
+            label = { Text("Usuario (email)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))

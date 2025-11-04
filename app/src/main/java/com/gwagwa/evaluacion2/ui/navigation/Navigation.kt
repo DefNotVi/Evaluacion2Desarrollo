@@ -25,7 +25,7 @@ fun AppNavigation() {
         navController = navController,
         startDestination = AppDestinations.LOGIN // Empieza en Login
     ) {
-        // --- 1. Login ---
+        // Login
         composable(AppDestinations.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
@@ -37,7 +37,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 2. Registro ---
+        // Registro
         composable(AppDestinations.REGISTER) {
             RegisterScreen(
                 onRegistrationSuccess = {
@@ -47,7 +47,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 3. Dashboard (Pantalla Principal) ---
+        // Dashboard (Pantalla Principal)
         composable(AppDestinations.DASHBOARD) {
             DashboardScreen(
                 onNavigateToProfile = { navController.navigate(AppDestinations.PROFILE) },
@@ -60,7 +60,7 @@ fun AppNavigation() {
             )
         }
 
-        // --- 4. Perfil ---
+        // Perfil
         composable(AppDestinations.PROFILE) {
             ProfileScreen()
         }

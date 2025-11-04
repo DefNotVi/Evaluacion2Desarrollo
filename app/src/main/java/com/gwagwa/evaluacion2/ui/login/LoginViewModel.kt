@@ -52,7 +52,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             val request = LoginRequest(
-                email = _uiState.value.username.trim(), // DummyJSON usa 'username'
+                email = _uiState.value.username.trim(), // DummyJSON usa "username", aquí lo dejo en email porque el Xano usa el email
                 password = _uiState.value.password.trim(),
             )
 
@@ -72,16 +72,17 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+ /** esto mejor lo comento en caso de necesitarlo en algun otro momento
+
     init {
         // Ejecutar una vez para asegurar que no hay token residual
         viewModelScope.launch {
             sessionManager.clearAuthToken()
         }
     }
-
+*/
     /**
-     * Simulamos el registro, ya que DummyJSON no tiene endpoint.
-     * Si la rúbrica exige la pantalla, la implementamos y navegamos al éxito.
+     * Simular el registro, ya que hubieron problemas con el codigo
      */
     fun register() {
         if (_uiState.value.username.isBlank() || _uiState.value.password.isBlank()) {
@@ -89,8 +90,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        // Asume que el registro fue exitoso y lleva al usuario a Login/Dashboard.
-        // En un proyecto real, aquí llamarías a authRepository.register(...)
+        // Se asume que el registro fue exitoso y lleva a Login/Dashboard.
         _uiState.update { it.copy(isRegistrationSuccess = true) }
     }
 

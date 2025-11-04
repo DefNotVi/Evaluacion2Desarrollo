@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-// ✅ Importación de tu tema, asumiendo que contiene las constantes de color
+// Importación del tema
 import com.gwagwa.evaluacion2.ui.theme.*
 
 @Composable
@@ -26,7 +26,7 @@ fun ImagePickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        // Usamos MaterialTheme.colorScheme.surface ya que 'Surface' podría no ser una constante de color simple
+        // Uso el MaterialTheme.colorScheme.surface pq 'Surface' podría no ser un color simple
         containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
@@ -61,7 +61,7 @@ fun ImagePickerDialog(
                     onClick = onCameraClick
                 )
 
-                // ✅ Reemplazo de ShadcnDivider por Divider de Material 3
+                //Reemplazo de Divider por HorizontalDivider de Material 3 asi se dividen las opciones
                 HorizontalDivider()
 
                 // Opción de Galería
@@ -75,10 +75,10 @@ fun ImagePickerDialog(
         },
         confirmButton = {},
         dismissButton = {
-            // ✅ Reemplazo de ShadcnButton por OutlinedButton de Material 3
+            // Reemplazo de ShadcnButton por OutlinedButton de Material 3
             OutlinedButton(
                 onClick = onDismiss,
-                // Parámetros 'variant' y 'size' eliminados ya que no existen en OutlinedButton estándar
+                // Parámetros 'variant' y 'size' eliminados ya que no existen en OutlinedButton normal
             ) {
                 Text("Cancelar")
             }
@@ -93,11 +93,11 @@ private fun ImagePickerOption(
     description: String,
     onClick: () -> Unit
 ) {
-    // ✅ Reemplazo de ShadcnCard por Card de Material 3
+    // Reemplazo de ShadcnCard por Card de Material 3
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            // Hacemos la Card clickeable, ya que Card de Material 3 no siempre lo es por defecto
+            // La Card se hace clickeable, ya que Card de Material 3 no siempre lo es por defecto
             .clickable(onClick = onClick),
         // Parámetro 'elevation' eliminado (usa el valor por defecto o ContentElevation)
     ) {
@@ -110,7 +110,7 @@ private fun ImagePickerOption(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                // ✅ Uso de la constante 'Primary' de tu tema
+                // Uso de la constante "Primary" del tema
                 tint = Primary,
                 modifier = Modifier.size(48.dp)
             )
@@ -124,7 +124,7 @@ private fun ImagePickerOption(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        // ✅ Uso de la constante 'Foreground' de tu tema
+                        // Uso de la constante "Foreground" del tema
                         color = Foreground
                     )
                 )
@@ -134,7 +134,7 @@ private fun ImagePickerOption(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        // ✅ Uso de la constante 'ForegroundMuted' de tu tema
+                        // Uso de la constante "ForegroundMuted" del tema
                         color = ForegroundMuted
                     )
                 )

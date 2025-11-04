@@ -1,6 +1,6 @@
 package com.gwagwa.evaluacion2.ui.profile
 
-// 1. Imports de Android
+// Imports de Android
 import android.Manifest
 import android.content.Context
 import android.net.Uri
@@ -10,13 +10,13 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-// 2. Imports de Compose Activity / Lifecycle
+//Imports de Compose Activity / Lifecycle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
 
-// 3. Imports de Compose UI y Material
+// Imports de Compose UI y Material
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,15 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
-// 4. Imports de Accompanist Permissions (Deben estar en tu build.gradle.kts)
+// Imports de Accompanist Permissions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.isGranted // ⬅️ ¡CORRECCIÓN CRÍTICA DE IMPORTACIÓN!
+import com.google.accompanist.permissions.isGranted
 
-// 5. Imports de Componentes y Tema
+//Imports de Componentes y Tema
 import com.gwagwa.evaluacion2.ui.components.ImagePickerDialog
-import com.gwagwa.evaluacion2.ui.theme.* // ⬅️ ¡CORRECCIÓN CRÍTICA PARA USAR Foreground y Primary!
-
+import com.gwagwa.evaluacion2.ui.theme.*
 
 // Necesario para usar rememberMultiplePermissionsState
 @OptIn(ExperimentalPermissionsApi::class)
@@ -56,11 +55,11 @@ fun ProfileScreen(
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
 
-    // Estados de la UI para manejar el diálogo y el URI temporal de la cámara
+    // Estados de la UI para manejar el dialogo y el URI temporal de la camara
     var showImagePicker by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) } // URI temporal para guardar la foto
 
-    // 1. Definir los permisos según la versión de Android
+    // Definir los permisos según la versión de Android
     val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         listOf(Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES)
     } else {
@@ -68,7 +67,7 @@ fun ProfileScreen(
     }
     val permissionsState = rememberMultiplePermissionsState(permissions)
 
-    // 2. Launcher para capturar foto con cámara
+    // Launcher para capturar foto con cámara
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -78,7 +77,7 @@ fun ProfileScreen(
         }
     }
 
-    // 3. Launcher para seleccionar imagen de galería
+    // Launcher para seleccionar imagen de galería
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -86,14 +85,14 @@ fun ProfileScreen(
         uri?.let { viewModel.updateAvatar(it) }
     }
 
-    // 4. Mostrar el diálogo de selección de imagen (Se muestra si showImagePicker es true)
+    // Mostrar el diálogo de selección de imagen (Se muestra si showImagePicker es true)
     if (showImagePicker) {
         ImagePickerDialog(
             onDismiss = { showImagePicker = false },
             onCameraClick = {
                 showImagePicker = false
                 if (permissionsState.permissions.any {
-                        it.permission == Manifest.permission.CAMERA && it.status.isGranted // ⬅️ CORRECCIÓN DE hasPermission
+                        it.permission == Manifest.permission.CAMERA && it.status.isGranted
                     }) {
                     // Crear archivo temporal para la foto
                     tempCameraUri = createImageUri(context)
@@ -112,7 +111,7 @@ fun ProfileScreen(
                 }
 
                 if (permissionsState.permissions.any {
-                        it.permission == imagePermission && it.status.isGranted // ⬅️ CORRECCIÓN DE hasPermission
+                        it.permission == imagePermission && it.status.isGranted //
                     }) {
                     // Lanzar selector de galería
                     pickImageLauncher.launch("image/*")
@@ -136,14 +135,14 @@ fun ProfileScreen(
             .padding(16.dp)
     ) {
         when {
-            // Estado: Cargando
+            // Estado de Cargando con la animacion de "CircularProgressIndicator"
             state.isLoading -> {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
 
-            // Estado: Error
+            // Estado de Error (cuantas veces vi este mensaje 😭)
             state.error != null -> {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
@@ -167,7 +166,7 @@ fun ProfileScreen(
                 }
             }
 
-            // Estado: Datos cargados (AÑADIMOS la nueva UI de la guía aquí)
+            // Estado de Datos cargados
             else -> {
                 Column(
                     modifier = Modifier.align(Alignment.TopCenter),
@@ -195,7 +194,7 @@ fun ProfileScreen(
                                 modifier = Modifier.size(120.dp),
                                 contentAlignment = Alignment.BottomEnd
                             ) {
-                                // Avatar principal (AsyncImage o Icono)
+                                // Avatar principal (AsyncImage o Icon)
                                 if (state.avatarUri != null) {
                                     // Mostrar imagen seleccionada con Coil
                                     AsyncImage(
@@ -205,7 +204,7 @@ fun ProfileScreen(
                                             .fillMaxSize()
                                             .clip(CircleShape)
                                             .clickable { showImagePicker = true }
-                                            .background(Primary), // Usa tu constante Primary
+                                            .background(Primary), // Usa la constante Primary del tema
                                         contentScale = ContentScale.Crop
                                     )
                                 } else {
@@ -215,7 +214,7 @@ fun ProfileScreen(
                                             .fillMaxSize()
                                             .clickable { showImagePicker = true },
                                         shape = CircleShape,
-                                        color = Primary // Usa tu constante Primary
+                                        color = Primary // Usa la constante Primary
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Person,
@@ -234,13 +233,13 @@ fun ProfileScreen(
                                         .size(36.dp)
                                         .clickable { showImagePicker = true },
                                     shape = CircleShape,
-                                    color = MaterialTheme.colorScheme.surface, // Usamos colorScheme.surface
+                                    color = MaterialTheme.colorScheme.surface, // Usa colorScheme.surface
                                     shadowElevation = 2.dp
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.CameraAlt,
                                         contentDescription = "Cambiar foto",
-                                        tint = Primary, // Usa tu constante Primary
+                                        tint = Primary, // Usa la constante Primary
                                         modifier = Modifier.padding(8.dp)
                                     )
                                 }
@@ -250,10 +249,10 @@ fun ProfileScreen(
 
                             // User Name
                             Text(
-                                text = state.userName, // Usamos state.userName (ajustado de la guía)
+                                text = state.userName, // Usa state.userName
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = Foreground // Usa tu constante Foreground
+                                    color = Foreground // Usa la constante Foreground
                                 )
                             )
 
@@ -261,14 +260,14 @@ fun ProfileScreen(
 
                             // User Email
                             Text(
-                                text = state.userEmail, // Usamos state.userEmail (ajustado de la guía)
+                                text = state.userEmail, // Usa state.userEmail
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = ForegroundMuted // Usa tu constante ForegroundMuted
+                                    color = ForegroundMuted // Usa la constante ForegroundMuted
                                 )
                             )
                         }
                     }
-                    // ⬆️ Fin del Avatar Card
+                    // Fin del Avatar Card
 
                     Spacer(modifier = Modifier.height(16.dp))
 
