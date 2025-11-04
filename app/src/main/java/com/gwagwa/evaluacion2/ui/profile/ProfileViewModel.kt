@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.update
 
-import com.gwagwa.evaluacion2.repository.AvatarRepository // Importación necesaria
+import com.gwagwa.evaluacion2.repository.AvatarRepository
 
 /**
  * Estado de la UI
@@ -30,6 +30,7 @@ data class ProfileUiState(
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
     // Repositorio de la API
+    // Nota: El UserRepository ya está configurado para devolver datos simulados
     private val userRepository = UserRepository(application.applicationContext)
 
     // Repositorio de DataStore para el avatar
@@ -43,12 +44,13 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         // Inicia la observación del URI del avatar guardado en DataStore
-        // Este Flow actualiza automáticamente el estado cada vez que se guarda un nuevo URI.
         viewModelScope.launch {
             avatarRepository.getAvatarUri().collect { uri ->
                 _uiState.update { it.copy(avatarUri = uri) }
             }
         }
+        // Cargar los datos del usuario al iniciar el ViewModel
+        loadUser()
     }
 
     /**
@@ -63,10 +65,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
 
     /**
-     * Carga los datos del usuario desde la API
+     * Carga los datos del usuario desde la SIMULACIÓN del repositorio.
+     * Ya no usa Result<T>, por lo que el manejo es directo con try-catch.
      */
-
-
     fun loadUser() {
         // 1. Indicar que está cargando usando .update{}
         _uiState.update {
@@ -75,32 +76,30 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
         // Ejecutar en coroutine (no bloquea la UI)
         viewModelScope.launch {
-            val result = userRepository.fetchProfile()
+            try {
+                // LLAMADA SIMULADA: Retorna directamente UserDto (ya no usa Result)
+                val user = userRepository.fetchProfile()
 
-            // Actualizar el estado según el resultado
-            // Usar .fold para manejar el resultado y actualizar el estado
-            result.fold(
-                onSuccess = { user ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            userName = user.username,
-                            userEmail = user.email ?: "Sin email",
-                            // ⚠️ Asume que user.avatarUrl es el campo de tu DTO
-                            // avatarUrl = user.avatarUrl,
-                            error = null
-                        )
-                    }
-                },
-                onFailure = { exception ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = exception.localizedMessage ?: "Error desconocido"
-                        )
-                    }
+                // ÉXITO: Actualizar el estado
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        // ✅ CORRECCIÓN: Usar los campos del DTO simulado
+                        userName = user.username,
+                        userEmail = user.email,
+                        error = null
+                    )
                 }
-            )
+            } catch (exception: Exception) {
+                // FALLO SIMULADO: En una simulación, esto es poco probable, pero es una buena práctica.
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        // Muestra el error si ocurre
+                        error = exception.localizedMessage ?: "Error al cargar el perfil simulado"
+                    )
+                }
+            }
         }
     }
 }
