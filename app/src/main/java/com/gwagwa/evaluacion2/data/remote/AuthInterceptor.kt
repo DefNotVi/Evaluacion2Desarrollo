@@ -1,6 +1,7 @@
 package com.gwagwa.evaluacion2.data.remote
 
 import com.gwagwa.evaluacion2.data.local.SessionManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -22,38 +23,24 @@ class AuthInterceptor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val originalRequest = chain.request()
-
-        // Recuperar el token (usando runBlocking porque intercept no es suspend)
+        // 1. Obtener el token de manera síncrona
         val token = runBlocking {
             sessionManager.getAuthToken()
         }
 
-        // Si hay un token, añade el Header
-        val requestWithAuth = if (token != null) {
+        val originalRequest = chain.request()
+
+        // 2. Modificar la petición SOLAMENTE si hay un token
+        val requestToProceed = if (!token.isNullOrEmpty()) {
             originalRequest.newBuilder()
-                .header("Authorization", "Bearer $token") // ⬅️ Formato estándar JWT
+                .header("Authorization", "Bearer $token")
                 .build()
         } else {
+            // Si no hay token, usar la petición original
             originalRequest
         }
 
-
-        // Si no hay token, continuar con la petición original
-        if (token.isNullOrEmpty()) {
-            return chain.proceed(originalRequest)
-        }
-
-
-
-        // Crear nueva petición CON el token
-        val authenticatedRequest = originalRequest.newBuilder()
-            .header("Authorization", "Bearer $token")
-            .build()
-
-        // Continuar con la petición autenticada
-        return chain.proceed(requestWithAuth)
-
-
+        // 3. Continuar con la petición (autenticada o la original)
+        return chain.proceed(requestToProceed)
     }
 }

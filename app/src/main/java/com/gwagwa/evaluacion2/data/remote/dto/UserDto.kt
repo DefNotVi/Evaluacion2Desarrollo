@@ -22,6 +22,6 @@ data class UserDto(
     @SerializedName("lastName")
     val lastName: String,
 
-    @SerializedName("image")
-    val image: String? = null  // URL de imagen de perfil (opcional) <--toca cambiar eso :O
+    @SerializedName("avatarUrl")
+    val avatarUrl: String? = null
 )

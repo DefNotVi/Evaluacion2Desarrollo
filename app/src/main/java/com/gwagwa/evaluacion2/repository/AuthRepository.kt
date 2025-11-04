@@ -24,6 +24,8 @@ class AuthRepository(
 
     }
 
+
+
     /**
      * Cierre de Sesión: Elimina el token guardado.
      */
@@ -52,5 +54,6 @@ class AuthRepository(
             Result.failure(e)
         }
     }
+
 
 }

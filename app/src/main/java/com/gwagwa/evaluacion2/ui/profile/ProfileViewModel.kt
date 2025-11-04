@@ -65,35 +65,40 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     /**
      * Carga los datos del usuario desde la API
      */
-    fun loadUser(id: Int = 1) {
-        // Indicar que está cargando
-        _uiState.value = _uiState.value.copy(
-            isLoading = true,
-            error = null
-        )
+
+
+    fun loadUser() {
+        // 1. Indicar que está cargando usando .update{}
+        _uiState.update {
+            it.copy(isLoading = true, error = null)
+        }
 
         // Ejecutar en coroutine (no bloquea la UI)
         viewModelScope.launch {
-            val result = userRepository.fetchUser(id)
+            val result = userRepository.fetchProfile()
 
             // Actualizar el estado según el resultado
-            // Nota: Aquí estás usando _uiState.value = result.fold(...) lo cual es correcto.
-            _uiState.value = result.fold(
+            // Usar .fold para manejar el resultado y actualizar el estado
+            result.fold(
                 onSuccess = { user ->
-                    // ✅ Éxito: mostrar datos
-                    _uiState.value.copy(
-                        isLoading = false,
-                        userName = user.username,
-                        userEmail = user.email ?: "Sin email",
-                        error = null
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            userName = user.username,
+                            userEmail = user.email ?: "Sin email",
+                            // ⚠️ Asume que user.avatarUrl es el campo de tu DTO
+                            // avatarUrl = user.avatarUrl,
+                            error = null
+                        )
+                    }
                 },
                 onFailure = { exception ->
-                    // ❌ Error: mostrar mensaje
-                    _uiState.value.copy(
-                        isLoading = false,
-                        error = exception.localizedMessage ?: "Error desconocido"
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = exception.localizedMessage ?: "Error desconocido"
+                        )
+                    }
                 }
             )
         }

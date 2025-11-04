@@ -17,12 +17,21 @@ class UserRepository(context: Context) {
         .create(context)
         .create(ApiService::class.java)
 
+    suspend fun fetchProfile(): Result<UserDto> {
+        return try {
+            val user = apiService.getProfile()
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
     /**
      * Obtiene un usuario de la API
      *
      * Usa Result<T> para manejar éxito/error de forma elegante
      */
-    suspend fun fetchUser(id: Int = 1): Result<UserDto> {
+    /** su
+     * spend fun fetchUser(id: Int = 1): Result<UserDto> {
         return try {
             // Llamar a la API (esto puede tardar varios segundos)
             val user = apiService.getUserById(id)
@@ -34,5 +43,5 @@ class UserRepository(context: Context) {
             // Si algo falla (sin internet, timeout, etc.)
             Result.failure(e)
         }
-    }
+    }*/
 }

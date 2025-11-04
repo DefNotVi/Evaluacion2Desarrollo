@@ -126,7 +126,7 @@ fun ProfileScreen(
 
     // Cargar datos cuando la pantalla se abre (el LaunchedEffect ya estaba aquí)
     LaunchedEffect(Unit) {
-        viewModel.loadUser(1)
+        viewModel.loadUser()
     }
 
     // Contenedor principal de la pantalla
@@ -161,7 +161,7 @@ fun ProfileScreen(
                         color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.loadUser(1) }) {
+                    Button(onClick = { viewModel.loadUser() }) {
                         Text("Reintentar")
                     }
                 }
@@ -272,7 +272,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(onClick = { viewModel.loadUser(1) }) {
+                    Button(onClick = { viewModel.loadUser() }) {
                         Text("Refrescar")
                     }
                 }

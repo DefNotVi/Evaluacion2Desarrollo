@@ -17,24 +17,26 @@ object RetrofitClient {
      * Inicializa Retrofit con el contexto de la app
      * Llamar desde Application o ViewModel al inicio
      */
+// ...
     fun create(context: Context): Retrofit {
 
-        // 1️⃣ SessionManager para manejar el token
+        // 1️⃣ SessionManager
         val sessionManager = SessionManager(context)
 
-        // 2️⃣ AuthInterceptor para inyectar el token automáticamente
+        // 2️⃣ AuthInterceptor
         val authInterceptor = AuthInterceptor(sessionManager)
 
-        // 3️⃣ HttpLoggingInterceptor para debugging
+        // 3️⃣ HttpLoggingInterceptor
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY  // ⚠️ Cambiar a NONE en producción <-- sigo en desarrollo xd
+            level = HttpLoggingInterceptor.Level.BODY
         }
 
-        // 4️⃣ OkHttpClient con AMBOS interceptores
+        // 4️⃣ OkHttpClient: Orden recomendado
         val okHttpClient = OkHttpClient.Builder()
-            // ⚠️ ORDEN IMPORTANTE: AuthInterceptor primero, luego Logging <-- ok! no lo toco entonces :>
-            .addInterceptor(AuthInterceptor(sessionManager))    // Añade el token
-            .addInterceptor(loggingInterceptor)  // Muestra en Logcat (con token)
+            // Logging primero (para ver la request modificada por AuthInterceptor)
+            .addInterceptor(loggingInterceptor)
+            // Inyección del token
+            .addInterceptor(authInterceptor)
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .build()

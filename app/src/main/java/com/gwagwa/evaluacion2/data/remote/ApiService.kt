@@ -67,4 +67,7 @@ interface ApiService {
      */
     @GET("users/{id}")
     suspend fun getUserById(@Path("id") id: Int): UserDto
+
+    @GET("auth/me")
+    suspend fun getProfile(): UserDto
 }
