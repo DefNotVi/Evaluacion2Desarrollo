@@ -47,8 +47,7 @@ class AuthRepository(
     suspend fun register(request: RegisterRequest): Result<Unit> {
         return try {
             // Asumiendo que has creado la función register en ApiService
-            val response = apiService.register(request)
-            sessionManager.saveAuthToken(response.accessToken)
+            apiService.register(request)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

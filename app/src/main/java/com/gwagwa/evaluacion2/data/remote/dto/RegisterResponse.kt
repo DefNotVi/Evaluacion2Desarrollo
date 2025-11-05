@@ -1,7 +1,13 @@
 package com.gwagwa.evaluacion2.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
-data class RegisterRequest(
+
+/**
+ * DTO para la respuesta de login
+ * Datos que RECIBIMOS del servidor tras login exitoso
+ */
+data class RegisterResponse(
+
     @SerializedName("email")
     val email: String,
 
@@ -9,5 +15,5 @@ data class RegisterRequest(
     val password: String,
 
     @SerializedName("name")
-    val name: String?  // Opcional si Xano lo requiere
+    val name: String
 )

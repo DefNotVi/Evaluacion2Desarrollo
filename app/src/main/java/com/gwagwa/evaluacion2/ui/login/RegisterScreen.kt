@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gwagwa.evaluacion2.viewmodel.LoginViewModel
 
 @Composable
 fun RegisterScreen(
@@ -17,11 +18,11 @@ fun RegisterScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    // Simulación: Si el registro "fue exitoso", navegamos.
+    // Simulación: Si el registro "fue exitoso", navegamos
     LaunchedEffect(state.isRegistrationSuccess) {
         if (state.isRegistrationSuccess) {
-            // En un caso real, deberías navegar al Dashboard.
-            // Aquí te llevo al Login de nuevo para usar un usuario existente.
+            // En un caso real, debería navegar al Dashboard.
+            // Aquí lleva al Login de nuevo para usar un usuario existente
             onNavigateBack()
             viewModel.resetState()
         }
@@ -35,16 +36,25 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text("Crear Cuenta (Registro)", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
-        // Campo Usuario (email)
+        // Campo Usuario
         OutlinedTextField(
-            value = state.username,
-            onValueChange = viewModel::updateUsername,
-            label = { Text("Usuario (email)") },
+            value = state.name,
+            onValueChange = viewModel::updateName,
+            label = { Text("Nombre del Usuario") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo email
+        OutlinedTextField(
+            value = state.email,
+            onValueChange = viewModel::updateEmail,
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Campo Contraseña
         OutlinedTextField(
@@ -54,7 +64,7 @@ fun RegisterScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         state.error?.let {
             Text(it, color = MaterialTheme.colorScheme.error)

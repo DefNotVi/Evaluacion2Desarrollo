@@ -23,5 +23,9 @@ data class UserDto(
     val lastName: String,
 
     @SerializedName("avatarUrl")
-    val avatarUrl: String? = null
+    val avatarUrl: String? = null,
+
+    @SerializedName("token")
+    val token: String? = null
+
 )

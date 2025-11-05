@@ -44,6 +44,7 @@ import com.google.accompanist.permissions.isGranted
 //Imports de Componentes y Tema
 import com.gwagwa.evaluacion2.ui.components.ImagePickerDialog
 import com.gwagwa.evaluacion2.ui.theme.*
+import com.gwagwa.evaluacion2.viewmodel.ProfileViewModel
 
 // Necesario para usar rememberMultiplePermissionsState
 @OptIn(ExperimentalPermissionsApi::class)

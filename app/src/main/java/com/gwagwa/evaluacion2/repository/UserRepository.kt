@@ -17,7 +17,18 @@ class UserRepository(context: Context) {
         .create(context)
         .create(ApiService::class.java)
 
-    suspend fun fetchProfile(): UserDto {
+
+    suspend fun fetchProfile(): Result<UserDto> {
+        return try {
+            val user = apiService.getProfile()
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    /** suspend fun fetchProfile(): UserDto {
         // Retorna un objeto fijo en lugar de llamar a la API
         return UserDto(
             id = 999,
@@ -27,7 +38,7 @@ class UserRepository(context: Context) {
             firstName = "Carlos",
             lastName = "Torres"
         )
-    }
+    }*/
     /**
      * Obtiene un usuario de la API
      *

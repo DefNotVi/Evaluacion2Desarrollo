@@ -1,4 +1,4 @@
-package com.gwagwa.evaluacion2.ui.dashboard
+package com.gwagwa.evaluacion2.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

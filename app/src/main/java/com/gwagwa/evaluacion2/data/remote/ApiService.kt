@@ -21,7 +21,7 @@ interface ApiService {
     suspend fun login(@Body request: LoginRequest): LoginResponse
 
     @POST("auth/signup") // Ruta de Xano
-    suspend fun register(@Body request: RegisterRequest): LoginResponse
+    suspend fun register(@Body request: RegisterRequest): RegisterResponse
     // Asumimos que la respuesta de registro devuelve un LoginResponse o similar (con token).
 
     /**

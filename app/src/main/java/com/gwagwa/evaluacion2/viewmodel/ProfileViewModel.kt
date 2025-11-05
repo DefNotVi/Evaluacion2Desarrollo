@@ -1,4 +1,4 @@
-package com.gwagwa.evaluacion2.ui.profile
+package com.gwagwa.evaluacion2.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -20,6 +20,7 @@ data class ProfileUiState(
     val userName: String = "",
     val userEmail: String = "",
     val error: String? = null,
+    val token: String? = null,
     val avatarUri: Uri? = null
 )
 
@@ -76,30 +77,31 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
         // Ejecutar en coroutine (no bloquea la UI)
         viewModelScope.launch {
-            try {
-                // LLAMADA SIMULADA: Retorna directamente UserDto (ya no usa Result)
-                val user = userRepository.fetchProfile()
+            val result = userRepository.fetchProfile()
 
-                // ÉXITO: Actualizar el estado
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        // Usar los campos del DTO simulado
-                        userName = user.username,
-                        userEmail = user.email,
-                        error = null
-                    )
+            // Actualizar el estado según el resultado
+            // Usar .fold para manejar el resultado y actualizar el estado
+            result.fold(
+                onSuccess = { user ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            userName = user.username,
+                            userEmail = user.email?: "Sin email",
+                            token = user.token,
+                            error = null
+                        )
+                    }
+                },
+                onFailure = { exception ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = exception.localizedMessage ?: "Error desconocido"
+                        )
+                    }
                 }
-            } catch (exception: Exception) {
-                // FALLO SIMULADO: con creo que pase pero por si acaso jskldfh, igual me sirve en caso de cualquier cosa so
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        // Muestra el error si ocurre
-                        error = exception.localizedMessage ?: "Error al cargar el perfil simulado"
-                    )
-                }
-            }
+            )
         }
     }
 }
