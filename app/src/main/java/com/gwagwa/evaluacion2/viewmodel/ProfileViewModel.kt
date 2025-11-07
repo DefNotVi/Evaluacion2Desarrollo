@@ -17,7 +17,7 @@ import com.gwagwa.evaluacion2.repository.AvatarRepository
  */
 data class ProfileUiState(
     val isLoading: Boolean = false,
-    val userName: String = "",
+    val name: String = "",
     val userEmail: String = "",
     val error: String? = null,
     val token: String? = null,
@@ -77,6 +77,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
         // Ejecutar en coroutine (no bloquea la UI)
         viewModelScope.launch {
+
+
             val result = userRepository.fetchProfile()
 
             // Actualizar el estado según el resultado
@@ -86,7 +88,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            userName = user.username,
+                            name = user.name,
                             userEmail = user.email?: "Sin email",
                             token = user.token,
                             error = null

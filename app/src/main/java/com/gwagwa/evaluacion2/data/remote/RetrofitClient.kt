@@ -32,7 +32,7 @@ object RetrofitClient {
 
         // OkHttpClient (muestra cositas en el logcat :O)
         val okHttpClient = OkHttpClient.Builder()
-            // ⚠️ ORDEN IMPORTANTE: AuthInterceptor primero, luego Logging <-- ok! no lo toco entonces :>
+            // ⚠️ ORDEN IMPORTANTE: Logging primero, luego auth <-- ok! no lo toco entonces :>
             // Logging primero (para ver la request modificada por AuthInterceptor)
             .addInterceptor(loggingInterceptor)
             // Inyección del token

@@ -24,11 +24,14 @@ class AuthInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         // Obtener el token de manera síncrona
+
+        val originalRequest = chain.request()
+
         val token = runBlocking {
             sessionManager.getAuthToken()
         }
 
-        val originalRequest = chain.request()
+        println("token: $token")
 
         // Modificar la petición SOLO si hay un token
         val requestToProceed = if (!token.isNullOrEmpty()) {

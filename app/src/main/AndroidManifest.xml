@@ -9,6 +9,8 @@
     <!-- Para Android 12 y anteriores -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <!-- Declaración de característica de hardware de cámara -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
 
 

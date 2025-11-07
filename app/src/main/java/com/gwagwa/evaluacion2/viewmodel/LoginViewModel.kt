@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 // Estado de la UI para Login/Registro
 data class AuthUiState(
@@ -32,6 +33,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val apiService = RetrofitClient.create(application.applicationContext).create(ApiService::class.java)
     private val sessionManager = SessionManager(application.applicationContext)
     private val authRepository = AuthRepository(apiService, sessionManager)
+
+    init{
+        Timber.d("Aplicación iniciada")
+    }
+
+
 
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState
@@ -59,7 +66,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
+        Timber.i("Usuario autenticado: %s", _uiState.value.username)
+
+
+
         _uiState.update { it.copy(isLoading = true, error = null) }
+
 
         viewModelScope.launch {
             val request = LoginRequest(
@@ -67,7 +79,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 password = _uiState.value.password.trim(),
             )
 
+
             val result = authRepository.login(request)
+
+            Timber.d("Response: $result.body")
 
             result.fold(
                 onSuccess = {

@@ -9,11 +9,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.gwagwa.evaluacion2.ui.navigation.AppNavigation
 import com.gwagwa.evaluacion2.ui.theme.Evaluacion2Theme
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
         setContent {
+
             Evaluacion2Theme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

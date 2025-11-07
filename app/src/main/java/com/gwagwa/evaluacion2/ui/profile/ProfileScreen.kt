@@ -250,7 +250,7 @@ fun ProfileScreen(
 
                             // User Name
                             Text(
-                                text = state.userName, // Usa state.userName
+                                text = state.name, // Usa state.userName
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = Foreground // Usa la constante Foreground

@@ -8,12 +8,10 @@ import com.google.gson.annotations.SerializedName
  */
 data class RegisterResponse(
 
-    @SerializedName("email")
-    val email: String,
+    @SerializedName("id")
+    val id: Int,
 
-    @SerializedName("password")
-    val password: String,
-
-    @SerializedName("name")
-    val name: String
+    @SerializedName("authToken")
+    val accessToken: String,
 )
+

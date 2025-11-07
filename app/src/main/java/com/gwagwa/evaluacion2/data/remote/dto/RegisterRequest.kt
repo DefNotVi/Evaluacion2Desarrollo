@@ -9,5 +9,5 @@ data class RegisterRequest(
     val password: String,
 
     @SerializedName("name")
-    val name: String?  // Opcional si Xano lo requiere
+    val name: String?
 )
