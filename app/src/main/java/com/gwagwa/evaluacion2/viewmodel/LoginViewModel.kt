@@ -74,27 +74,38 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
 
         viewModelScope.launch {
+
+            try{
+
+
             val request = LoginRequest(
                 email = _uiState.value.username.trim(), // DummyJSON usa "username", aquí lo dejo en email porque el Xano usa el email
                 password = _uiState.value.password.trim(),
             )
 
 
-            val result = authRepository.login(request)
+            val response = authRepository.login(request)
 
-            Timber.d("Response: $result.body")
+            /** BORRAR ESTA LINEA CUANDO TERMINE DE HACER EL CODIGO*/
+            Timber.d("Response: $response.body")
 
-            result.fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
-                },
-                onFailure = { exception ->
-                    _uiState.update { it.copy(
-                        isLoading = false,
-                        error = exception.localizedMessage ?: "Error de autenticación."
-                    ) }
+           _uiState.update { it.copy(
+               isLoading = false,
+               isLoginSuccess = true) }
+                } catch (e: Exception) {
+                    // Errores de credenciales
+                    e.localizedMessage ?: "Error de credenciales"
+
+                    val mensajeError = e.localizedMessage
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = mensajeError
+                        )
+                    }
                 }
-            )
+
         }
     }
 
@@ -125,9 +136,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 name = _uiState.value.name.trim()
             )
 
-            val result = authRepository.register(request)
+            val response = authRepository.register(request)
 
-            result.fold(
+            response.fold(
                 onSuccess = {
                     _uiState.update { it.copy(isLoading = false, isRegistrationSuccess = true) }
                 },

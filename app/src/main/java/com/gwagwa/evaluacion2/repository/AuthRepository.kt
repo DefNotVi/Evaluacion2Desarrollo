@@ -12,7 +12,10 @@ class AuthRepository(
     /**
      * Lógica de Login: Llama a la API, guarda el token.
      */
-    suspend fun login(request: LoginRequest): Result<Unit> {
+
+
+ /** COMENTO ESTO POR SI ME SRIVE EN UN FUTURO
+  *  suspend fun login(request: LoginRequest): Result<Unit> {
         return try {
             val response = apiService.login(request)
             // Guarda el token de acceso para futuras peticiones
@@ -22,7 +25,22 @@ class AuthRepository(
             Result.failure(e)
         }
 
-    }
+    } */
+
+ // Asumimos que esta función está en tu AuthRepository.kt
+
+// Importante: Debes definir qué tipo de respuesta devuelve la API
+// Si la API devuelve un objeto con el token, úsalo aquí (ej: LoginResponse)
+// Si solo necesitas guardar el token y no devolver nada más, puedes usar Unit.
+// Lo ajustaré para que no devuelva nada, ya que el token se guarda internamente.
+
+ suspend fun login(request: LoginRequest) {
+     // Eliminé el 'Result<Unit>' del tipo de retorno
+     val response = apiService.login(request)
+
+     // Guarda el token de acceso para futuras peticiones.
+     sessionManager.saveAuthToken(response.accessToken)
+ }
 
 
 

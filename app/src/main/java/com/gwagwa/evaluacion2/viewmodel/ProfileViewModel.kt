@@ -67,7 +67,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     /**
      * Carga los datos del usuario desde la SIMULACIÓN del repositorio.
-     * Ya no usa Result<T>, por lo que el manejo es directo con try-catch.
+     * Ya no usa response<T>, por lo que el manejo es directo con try-catch.
      */
     fun loadUser() {
         // Indicar que está cargando usando .update{}
@@ -79,11 +79,11 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
 
 
-            val result = userRepository.fetchProfile()
+            val response = userRepository.fetchProfile()
 
             // Actualizar el estado según el resultado
             // Usar .fold para manejar el resultado y actualizar el estado
-            result.fold(
+            response.fold(
                 onSuccess = { user ->
                     _uiState.update {
                         it.copy(
