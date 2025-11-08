@@ -66,7 +66,7 @@
 
 - **Avatar:** URI de la imagen de perfil almacenada en DataStore (AvatarRepository)
 
-- **Recursos nativos:** Integración de Cámara/Galería para seleccionar la imagen de perfil. Incluye el manejo de permisos y un fallback con mensaje al usuario si el permiso es denegado.
+- **Recursos nativos:** Integración de Cámara/Galería para seleccionar la imagen de perfil
 
 - **Animaciones con propósito:** Transiciones y efectos de carga (progress indicators) para mejorar el feedback al usuario durante la espera.
 
@@ -124,6 +124,6 @@
 
 **Casos de Error:**
 
-- Error de credenciales: El AuthViewModel captura el error del API (por ej, 400 o 401) y muestra un mensaje de error en la pantalla de Login
+- Error de credenciales: El LoginViewModel captura el error del API (por ej, 400 o 401) y muestra un mensaje de error en la pantalla de Login sin incluir el codigo del error
 
 - Error de red/servidor: Las peticiones de la API están envueltas en try-catch. En caso de timeout o falta de conexión, se actualiza el estado a error, mostrando un mensaje al usuario
