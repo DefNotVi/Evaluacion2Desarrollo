@@ -8,6 +8,8 @@ import com.gwagwa.evaluacion2.ui.login.LoginScreen
 import com.gwagwa.evaluacion2.ui.login.RegisterScreen
 import com.gwagwa.evaluacion2.ui.dashboard.DashboardScreen
 import com.gwagwa.evaluacion2.ui.profile.ProfileScreen
+import com.gwagwa.evaluacion2.viewmodel.LoginViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // Rutas de la aplicación
 object AppDestinations {
@@ -27,7 +29,11 @@ fun AppNavigation() {
     ) {
         // Login
         composable(AppDestinations.LOGIN) {
+
+            val loginViewModel: LoginViewModel = viewModel()
+
             LoginScreen(
+                viewModel = loginViewModel,
                 onLoginSuccess = {
                     navController.navigate(AppDestinations.DASHBOARD) {
                         popUpTo(AppDestinations.LOGIN) { inclusive = true }
@@ -62,7 +68,9 @@ fun AppNavigation() {
 
         // Perfil
         composable(AppDestinations.PROFILE) {
-            ProfileScreen()
+            ProfileScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

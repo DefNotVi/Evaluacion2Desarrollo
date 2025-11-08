@@ -85,7 +85,7 @@ dependencies {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
         // DataStore - Para guardar tokens
-        implementation("androidx.datastore:datastore-preferences:1.0.0")
+        implementation("androidx.datastore:datastore-preferences:1.1.1")
 
         // Coil - Para cargar imágenes desde URLs (opcional)
         implementation("io.coil-kt:coil-compose:2.6.0")

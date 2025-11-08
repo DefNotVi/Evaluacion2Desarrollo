@@ -50,7 +50,8 @@ import com.gwagwa.evaluacion2.viewmodel.ProfileViewModel
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = viewModel() // ⚠️ Cambia el ID según necesites //<-- sure will!
+    viewModel: ProfileViewModel = viewModel(), // ⚠️ Cambia el ID según necesites //<-- sure will!
+    onNavigateBack: () -> Unit
 ) {
     // Obtener el contexto local y el estado del ViewModel
     val context = LocalContext.current
@@ -274,6 +275,11 @@ fun ProfileScreen(
 
                     Button(onClick = { viewModel.loadUser() }) {
                         Text("Refrescar")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onNavigateBack) {
+                        Text("Volver al Dashboard")
                     }
                 }
             }

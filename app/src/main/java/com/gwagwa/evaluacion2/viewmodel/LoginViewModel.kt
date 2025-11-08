@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import retrofit2.HttpException
+import java.io.IOException
 
 // Estado de la UI para Login/Registro
 data class AuthUiState(
@@ -30,14 +32,27 @@ data class AuthUiState(
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     // Repositorios y Servicios
-    private val apiService = RetrofitClient.create(application.applicationContext).create(ApiService::class.java)
+    private val apiService =
+        RetrofitClient.create(application.applicationContext).create(ApiService::class.java)
     private val sessionManager = SessionManager(application.applicationContext)
     private val authRepository = AuthRepository(apiService, sessionManager)
 
-    init{
+    init {
         Timber.d("Aplicación iniciada")
     }
 
+    /**
+     * Reinicia el estado de la UI a así no se loopea al cerrar la sesión
+     */
+    fun resetState() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoading = false,
+                isLoginSuccess = false,
+                error = null
+            )
+        }
+    }
 
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -59,6 +74,22 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(password = password, error = null) }
     }
 
+    /**
+     * Comprueba si el usuario ya ha iniciado sesión.
+     * Esta función es útil para la navegación inicial.
+     */
+    fun checkIfUserIsLoggedIn() {
+
+        viewModelScope.launch {
+            sessionManager.authToken.collect { token ->
+                if (!token.isNullOrBlank()) {
+                    // Si hay un token, consideramos el login como exitoso para redirigir al usuario
+                    _uiState.update { it.copy(isLoginSuccess = true) }
+                }
+            }
+        }
+    }
+
     fun login() {
         // Validación de formulario
         if (_uiState.value.username.isBlank() || _uiState.value.password.isBlank()) {
@@ -66,61 +97,67 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        Timber.i("Usuario autenticado: %s", _uiState.value.username)
-
-
-
         _uiState.update { it.copy(isLoading = true, error = null) }
 
 
         viewModelScope.launch {
 
-            try{
+            try {
 
 
-            val request = LoginRequest(
-                email = _uiState.value.username.trim(), // DummyJSON usa "username", aquí lo dejo en email porque el Xano usa el email
-                password = _uiState.value.password.trim(),
-            )
+                val request = LoginRequest(
+                    email = _uiState.value.username.trim(), // DummyJSON usa "username", aquí lo dejo en email porque el Xano usa el email
+                    password = _uiState.value.password.trim(),
+                )
 
 
-            val response = authRepository.login(request)
+                val response = authRepository.login(request)
 
-            /** BORRAR ESTA LINEA CUANDO TERMINE DE HACER EL CODIGO*/
-            Timber.d("Response: $response.body")
+                /** BORRAR ESTA LINEA CUANDO TERMINE DE HACER EL CODIGO*/
+                Timber.d("Response: $response.body")
 
-           _uiState.update { it.copy(
-               isLoading = false,
-               isLoginSuccess = true) }
-                } catch (e: Exception) {
-                    // Errores de credenciales
-                    e.localizedMessage ?: "Error de credenciales"
+                val authToken = response.accessToken
 
-                    val mensajeError = e.localizedMessage
+                authRepository.saveToken(authToken)
 
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = mensajeError
-                        )
+
+
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isLoginSuccess = true
+                    )
+                }
+            } catch (e: Exception) {
+                // Errores de credenciales
+                val mensajeError = when (e) {
+                    // Captura errores HTTP (401, 403, 404, 500, etc (esta linea es MUY BUENA, descubrimiento del año definitivamente))
+                    is HttpException -> {
+                        "Usuario o contraseña incorrectos. intentalo de nuevo"
+                    }
+                    // Captura errores de red (sin internet, servidor caído, cosas así idk)
+                    is IOException -> {
+                        "No se pudo conectar al servidor. Revisa tu conexión a internet"
+                    }
+                    // Para cualquier otro tipo de error inesperado
+                    else -> {
+                        "Ocurrió un error inesperado. Inténtalo de nuevo más tarde"
                     }
                 }
 
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = mensajeError
+                    )
+                }
+            }
+
         }
     }
 
- /** esto mejor lo comento en caso de necesitarlo en algun otro momento
 
-    init {
-        // Ejecutar una vez para asegurar que no hay token residual
-        viewModelScope.launch {
-            sessionManager.clearAuthToken()
-        }
-    }
-*/
-    /**
-     * Simular el registro, ya que hubieron problemas con el codigo
-     */
     fun register() {
         if (_uiState.value.name.isBlank() || _uiState.value.password.isBlank() || _uiState.value.email.isBlank()) {
             _uiState.update { it.copy(error = "Usuario y contraseña requeridos.") }
@@ -130,34 +167,53 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
-            val request = RegisterRequest(
-                email = _uiState.value.email.trim(),
-                password = _uiState.value.password.trim(),
-                name = _uiState.value.name.trim()
-            )
 
-            val response = authRepository.register(request)
+            try {
 
-            response.fold(
-                onSuccess = {
+
+                val request = RegisterRequest(
+                    email = _uiState.value.email.trim(),
+                    password = _uiState.value.password.trim(),
+                    name = _uiState.value.name.trim()
+                )
+
+                // Llama al repositorio para obtener la respuesta completa de la API
+                val response = authRepository.register(request)
+
+                    // El registro fue REALMENTE exitoso
                     _uiState.update { it.copy(isLoading = false, isRegistrationSuccess = true) }
-                },
-                onFailure = { exception ->
-                    _uiState.update { it.copy(
-                        isLoading = false,
-                        error = exception.localizedMessage ?: "Error de Registro, porfavor inserte los datos adecuadamente."
-                    ) }
+
+
+            } catch (e: Exception) {
+                // Este bloque 'catch' ahora maneja correctamente errores y no manda al login cuando hay error
+                val mensajeError = when (e) {
+                    is HttpException -> {
+                        "Error en las credenciales, porfavor revise la contraseña y que el email esté bien escrito o no esté ya registrado"
+                    }
+                    is IOException -> {
+                        "No se pudo conectar al servidor. Revisa tu conexión a internet"
+                    }
+                    else -> {
+                        "Ocurrió un error inesperado"
+                    }
                 }
-            )
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = mensajeError
+                    )
+                }
+            }
+
+            /**
+             * comento eto por si me sirve mas adelante
+             * // Se asume que el registro fue exitoso y lleva a Login/Dashboard.
+            _uiState.update { it.copy(isRegistrationSuccess = true) }*/
         }
 
-      /**
-       * comento eto por si me sirve mas adelante
-       * // Se asume que el registro fue exitoso y lleva a Login/Dashboard.
-        _uiState.update { it.copy(isRegistrationSuccess = true) }*/
-    }
-
-    fun resetState() {
-        _uiState.update { AuthUiState() }
+        fun resetState() {
+            _uiState.update { AuthUiState() }
+        }
     }
 }

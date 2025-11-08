@@ -18,10 +18,9 @@ fun RegisterScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    // Simulación: Si el registro "fue exitoso", navegamos
+    // Si el registro fue exitoso, navegamos
     LaunchedEffect(state.isRegistrationSuccess) {
         if (state.isRegistrationSuccess) {
-            // En un caso real, debería navegar al Dashboard.
             // Aquí lleva al Login de nuevo para usar un usuario existente
             onNavigateBack()
             viewModel.resetState()
@@ -60,7 +59,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.password,
             onValueChange = viewModel::updatePassword,
-            label = { Text("Contraseña") },
+            label = { Text("Contraseña (use al menos una letra y numero)") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -71,7 +70,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Botón Registro (Simulado)
+        // Botón Registro
         Button(
             onClick = viewModel::register,
             enabled = !state.isLoading,

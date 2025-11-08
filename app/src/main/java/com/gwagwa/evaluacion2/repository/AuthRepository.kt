@@ -3,7 +3,9 @@ package com.gwagwa.evaluacion2.repository
 import com.gwagwa.evaluacion2.data.local.SessionManager
 import com.gwagwa.evaluacion2.data.remote.ApiService
 import com.gwagwa.evaluacion2.data.remote.dto.LoginRequest
+import com.gwagwa.evaluacion2.data.remote.dto.LoginResponse
 import com.gwagwa.evaluacion2.data.remote.dto.RegisterRequest
+import com.gwagwa.evaluacion2.data.remote.dto.RegisterResponse
 
 class AuthRepository(
     private val apiService: ApiService,
@@ -14,18 +16,11 @@ class AuthRepository(
      */
 
 
- /** COMENTO ESTO POR SI ME SRIVE EN UN FUTURO
-  *  suspend fun login(request: LoginRequest): Result<Unit> {
-        return try {
-            val response = apiService.login(request)
-            // Guarda el token de acceso para futuras peticiones
-            sessionManager.saveAuthToken(response.accessToken)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+ /** SI ME SIRVIÓ XD*/
+ suspend fun saveToken(token: String) {
+     sessionManager.saveAuthToken(token)
+ }
 
-    } */
 
  // Asumimos que esta función está en tu AuthRepository.kt
 
@@ -34,12 +29,14 @@ class AuthRepository(
 // Si solo necesitas guardar el token y no devolver nada más, puedes usar Unit.
 // Lo ajustaré para que no devuelva nada, ya que el token se guarda internamente.
 
- suspend fun login(request: LoginRequest) {
+ suspend fun login(request: LoginRequest): LoginResponse {
      // Eliminé el 'Result<Unit>' del tipo de retorno
      val response = apiService.login(request)
 
      // Guarda el token de acceso para futuras peticiones.
      sessionManager.saveAuthToken(response.accessToken)
+
+     return response
  }
 
 
@@ -62,14 +59,10 @@ class AuthRepository(
     /**
      * Lógica de Registro: Llama a la API, recibe el token y guarda la sesión.
      */
-    suspend fun register(request: RegisterRequest): Result<Unit> {
-        return try {
-            // Asumiendo que has creado la función register en ApiService
-            apiService.register(request)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    suspend fun register(request: RegisterRequest): RegisterResponse {
+        // Ahora simplemente llama a la función de la API y devuelve su resultado
+        // El bloque try-catch lo moví al LoginViewModel
+        return apiService.register(request)
     }
 
 

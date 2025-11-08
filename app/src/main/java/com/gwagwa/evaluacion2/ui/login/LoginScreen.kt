@@ -18,6 +18,10 @@ fun LoginScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.checkIfUserIsLoggedIn()
+    }
+
     LaunchedEffect(state.isLoginSuccess) {
         if (state.isLoginSuccess) {
             onLoginSuccess()

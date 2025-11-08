@@ -12,7 +12,7 @@
 
 - **Framework:** Android SDK (API 33+)
 
-- **Librerías:** Jetpack Compose, Kotlin Coroutines & Flow, Retrofit/OkHttp, DataStore, Dagger Hilt.
+- **Librerías:** Jetpack Compose, Kotlin Coroutines & Flow, Retrofit/OkHttp, DataStore.
 
 **Instalación:**
 
@@ -24,9 +24,11 @@
 
 **Ejecución:**
 
-- **Perfil de Pruebas:** Se utilizarán las credenciales de prueba provistas al instructor para simular el inicio de sesión
+- Presiona el botón de ejecutar
 
-- **Simulación de Perfil:** El endpoint /auth/me está configurado para mostrar un usuario simulado en el UserRepository para la demostración evitando fallos de autenticación debido a los problemas de la api que se entregó
+- **Perfiles de Uso:**
+- **Usuario Nuevo:** Abre la app y ve a la pantalla de registro dandole al boton "¿No tienes cuenta? Regístrate", crea una cuenta e inicia sesion
+- **Usuario Existente:** Abre la app e inicia sesión, la próxima vez que se abra la app, se va a redirigir directamente a la pantalla principal hasta que se cierre la sesión
 
 ## 3. Arquitectura y flujo
 
@@ -50,13 +52,13 @@
 
 **Navegación:**
 
-- **Stack:** Se utiliza la navegación de Jetpack Compose (Compose Navigation). El flujo principal respeta el backstack: Tras el login, el usuario es dirigido a Profile/Dashboard, y el botón de retroceso no lo devuelve a la pantalla de Login.
+- **Stack:** Se utiliza la navegación de Jetpack Compose (Compose Navigation). El flujo principal respeta el backstack: Tras el login, el usuario es dirigido a Profile/Dashboard, y el botón de cerrar sesión lo devuelve a la pantalla de Login cerrando la sesión actual.
 
 ## 4. Funcionalidades
 
 - **Formulario validado:** Formulario de Login/Registro, valida campos de email y password (requeridos), bloqueando el envío si no son válidos (como por ej, email inválido o contraseña vacía)
 
-- **Navegación y backstack:** Flujo de la aplicación con transiciones suaves y gestión correcta del historial de navegación
+- **Navegación y backstack:** Flujo de la aplicación con transiciones suaves y gestión correcta del inicio de sesión
 
 - **Gestión de estado:** Se manejan los estados de Carga (isLoading), Éxito (datos de perfil) y Error (mensajes visibles en la UI) sincronizados con la respuesta del Repository
 
@@ -100,7 +102,7 @@
 
 - GET /auth/me
 
-- Requerimiento: Header Authorization: Bearer
+- Requerimiento: Header Authorization: Bearer (el token)
 
 - Respuesta (Ejemplo): 200 { id, email, name, avatarUrl?} 
 
@@ -108,7 +110,7 @@
 
 **Flujo principal (Login exitoso):**
 
-- El usuario ingresa email y password en la pantalla de Login y presiona "Iniciar Sesión" (inicie preferencialmente con “ mi.correo.unico@test.com/MiPasswordSegura123”)
+- El usuario ingresa email y password en la pantalla de Login y presiona "Ingresar" (o puede optar por registrarse dandole a "¿No tienes cuenta? Regístrate")
 
 - El AuthRepository llama a POST /auth/login
 
@@ -116,7 +118,7 @@
 
 - La navegación redirige a la pantalla de Perfil/Dashboard
 
-- El ProfileViewModel llama a fetchProfile(), el cual utiliza el token guardado a través del AuthInterceptor para (simular) obtener los datos del usuario
+- El ProfileViewModel llama a fetchProfile(), el cual utiliza el token guardado a través del AuthInterceptor para obtener los datos del usuario
 
 - La pantalla de perfil muestra los datos y el avatar (si está guardado localmente)
 
