@@ -7,22 +7,22 @@ import com.google.gson.annotations.SerializedName
  * Este objeto representa los datos que VIAJAN entre tu app y el servidor
  */
 data class UserDto(
-    @SerializedName("id")
-    val id: Int,
-
-    @SerializedName("name")
-    val name: String,
+    @SerializedName("_id")
+    val id: String,
 
     @SerializedName("email")
     val email: String,
 
-    @SerializedName("created_at")
-    val createdAt: Long?,
+    @SerializedName("role")
+    val role: String,
+
+    @SerializedName("createdAt")
+    val createdAt: String,
+
+    @SerializedName("isActive")
+    val isActive: Boolean,
 
     @SerializedName("avatarUrl")
     val avatarUrl: String? = null,
-
-    @SerializedName("token")
-    val token: String? = null
 
 )

@@ -1,5 +1,5 @@
 package com.gwagwa.evaluacion2.viewmodel
-
+import kotlinx.coroutines.flow.first
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,17 +29,15 @@ data class AuthUiState(
     val error: String? = null
 )
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+class LoginRegisterViewModel(application: Application) : AndroidViewModel(application) {
 
     // Repositorios y Servicios
+
+
     private val apiService =
         RetrofitClient.create(application.applicationContext).create(ApiService::class.java)
     private val sessionManager = SessionManager(application.applicationContext)
     private val authRepository = AuthRepository(apiService, sessionManager)
-
-    init {
-        Timber.d("Aplicación iniciada")
-    }
 
     /**
      * Reinicia el estado de la UI a así no se loopea al cerrar la sesión
@@ -49,6 +47,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             currentState.copy(
                 isLoading = false,
                 isLoginSuccess = false,
+                isRegistrationSuccess = false,
                 error = null
             )
         }
@@ -81,19 +80,22 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun checkIfUserIsLoggedIn() {
 
         viewModelScope.launch {
-            sessionManager.authToken.collect { token ->
+            // Declara una variable 'token'
+            val token = sessionManager.authToken.first()
+
+            sessionManager.authToken.first()
                 if (!token.isNullOrBlank()) {
                     // Si hay un token, consideramos el login como exitoso para redirigir al usuario
                     _uiState.update { it.copy(isLoginSuccess = true) }
                 }
-            }
+
         }
     }
 
     fun login() {
         // Validación de formulario
         if (_uiState.value.username.isBlank() || _uiState.value.password.isBlank()) {
-            _uiState.update { it.copy(error = "Usuario y contraseña requeridos.") }
+            _uiState.update { it.copy(error = "Email y contraseña requeridos.") }
             return
         }
 
@@ -111,14 +113,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
 
-                val response = authRepository.login(request)
-
-                /** BORRAR ESTA LINEA CUANDO TERMINE DE HACER EL CODIGO*/
-                Timber.d("Response: $response.body")
-
-                val authToken = response.accessToken
-
-                authRepository.saveToken(authToken)
+                authRepository.login(request)
 
 
 
@@ -174,14 +169,19 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 val request = RegisterRequest(
                     email = _uiState.value.email.trim(),
                     password = _uiState.value.password.trim(),
+                    role = "CLIENTE",
                     name = _uiState.value.name.trim()
                 )
 
-                // Llama al repositorio para obtener la respuesta completa de la API
-                val response = authRepository.register(request)
+                // Le cambié el codigo, es como lo mismo y mas cortito
+
+                authRepository.register(request)
 
                     // El registro fue REALMENTE exitoso
-                    _uiState.update { it.copy(isLoading = false, isRegistrationSuccess = true) }
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        isRegistrationSuccess = true)
+                    }
 
 
             } catch (e: Exception) {

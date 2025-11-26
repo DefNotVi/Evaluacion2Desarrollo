@@ -18,10 +18,10 @@ interface ApiService {
      * sessionManager.saveAuthToken(response.accessToken)
      */
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+    suspend fun login(@Body request: LoginRequest): AuthResponse
 
-    @POST("auth/signup") // Ruta de Xano
-    suspend fun register(@Body request: RegisterRequest): RegisterResponse
+    @POST("auth/register") // Ruta de Xano
+    suspend fun register(@Body request: RegisterRequest): AuthResponse
     // Asumimos que la respuesta de registro devuelve un LoginResponse o similar (con token).
 
     /**
@@ -34,8 +34,8 @@ interface ApiService {
      * Ejemplo de uso:
      * val currentUser = apiService.getCurrentUser()
      */
-    @GET("user/me")
-    suspend fun getCurrentUser(): UserDto
+    @GET("auth/me")
+    suspend fun getCurrentProfile(): UserDto
 
     /**
      * 📋 OBTENER LISTA DE USUARIOS

@@ -8,13 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.gwagwa.evaluacion2.viewmodel.LoginViewModel
+import com.gwagwa.evaluacion2.viewmodel.LoginRegisterViewModel
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginRegisterViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 

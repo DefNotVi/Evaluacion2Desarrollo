@@ -88,9 +88,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            name = user.name,
-                            userEmail = user.email?: "Sin email",
-                            token = user.token,
+                            userEmail = user.email,
                             error = null
                         )
                     }

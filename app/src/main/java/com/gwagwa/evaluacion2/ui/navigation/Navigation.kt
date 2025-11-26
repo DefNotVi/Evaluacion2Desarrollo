@@ -8,7 +8,7 @@ import com.gwagwa.evaluacion2.ui.login.LoginScreen
 import com.gwagwa.evaluacion2.ui.login.RegisterScreen
 import com.gwagwa.evaluacion2.ui.dashboard.DashboardScreen
 import com.gwagwa.evaluacion2.ui.profile.ProfileScreen
-import com.gwagwa.evaluacion2.viewmodel.LoginViewModel
+import com.gwagwa.evaluacion2.viewmodel.LoginRegisterViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 // Rutas de la aplicación
@@ -30,7 +30,7 @@ fun AppNavigation() {
         // Login
         composable(AppDestinations.LOGIN) {
 
-            val loginViewModel: LoginViewModel = viewModel()
+            val loginViewModel: LoginRegisterViewModel = viewModel()
 
             LoginScreen(
                 viewModel = loginViewModel,
