@@ -14,8 +14,7 @@ class UserRepository(context: Context) {
 
     // Crear la instancia del API Service (pasando el contexto)
     private val apiService: ApiService = RetrofitClient
-        .create(context)
-        .create(ApiService::class.java)
+        .authApiService
 
 
     suspend fun fetchProfile(): Result<UserDto> {

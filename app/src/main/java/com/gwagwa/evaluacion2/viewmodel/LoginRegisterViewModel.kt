@@ -34,10 +34,9 @@ class LoginRegisterViewModel(application: Application) : AndroidViewModel(applic
     // Repositorios y Servicios
 
 
-    private val apiService =
-        RetrofitClient.create(application.applicationContext).create(ApiService::class.java)
+    private val apiService = RetrofitClient.authApiService
     private val sessionManager = SessionManager(application.applicationContext)
-    private val authRepository = AuthRepository(apiService, sessionManager)
+    private val authRepository = AuthRepository( apiService,sessionManager)
 
     /**
      * Reinicia el estado de la UI a así no se loopea al cerrar la sesión

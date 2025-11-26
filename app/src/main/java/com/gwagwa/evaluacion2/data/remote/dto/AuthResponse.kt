@@ -16,7 +16,7 @@ data class AuthResponse(
 
     @SerializedName("data")
     val data: AuthDataDto?
-)
+){
 
 data class AuthDataDto(
     @SerializedName("user")
@@ -24,4 +24,4 @@ data class AuthDataDto(
 
     @SerializedName("access_token")
     val accessToken: String,
-)
+)}

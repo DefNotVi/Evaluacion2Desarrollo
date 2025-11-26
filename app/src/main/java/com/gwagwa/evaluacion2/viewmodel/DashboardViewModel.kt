@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val apiService = RetrofitClient.create(application.applicationContext).create(ApiService::class.java)
+    private val apiService = RetrofitClient.authApiService
     private val sessionManager = SessionManager(application.applicationContext)
     private val authRepository = AuthRepository(apiService, sessionManager)
 

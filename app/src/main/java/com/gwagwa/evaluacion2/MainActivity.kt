@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.gwagwa.evaluacion2.data.remote.RetrofitClient
 import com.gwagwa.evaluacion2.ui.navigation.AppNavigation
 import com.gwagwa.evaluacion2.ui.theme.Evaluacion2Theme
 import timber.log.Timber
@@ -18,6 +19,7 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        RetrofitClient.create(this)
         setContent {
 
 
