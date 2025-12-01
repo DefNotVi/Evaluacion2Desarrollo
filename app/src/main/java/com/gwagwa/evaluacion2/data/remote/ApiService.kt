@@ -34,45 +34,23 @@ interface ApiService {
      * Ejemplo de uso:
      * val currentUser = apiService.getCurrentUser()
      */
-    @GET("auth/me")
-    suspend fun getCurrentProfile(): UserDto
+    @GET("auth/profile")
+    suspend fun getProfile(): ProfileResponse
 
-    /**
-     * 📋 OBTENER LISTA DE USUARIOS
-     * GET /users
-     *
-     * Ejemplo de uso:
-     * val response = apiService.getUsers()
-     * val usersList = response.users  // Lista de UserDto
-     */
-    @GET("users")
-    suspend fun getUsers(): UsersResponse
+    @GET("paquete-turistico/disponibles")
+    suspend fun getAvailableTourPackages(): PackageResponse
 
-    /**
-     * 🔍 BUSCAR USUARIOS POR NOMBRE
-     * GET /users/search?q={query}
-     *
-     * Ejemplo de uso:
-     * val results = apiService.searchUsers("John")
-     */
-    @GET("users/search")
-    suspend fun searchUsers(@Query("q") query: String): UsersResponse
+    // ✅ CORRECTO: "paquete-turistico" (sin /api)
+    @GET("paquete-turistico")
+    suspend fun getAllTourPackages(): List<PackageDto> // Para el endpoint que lista TODOS los paquetes
 
-    /**
-     * 👤 OBTENER USUARIO POR ID
-     * GET /users/{id}
-     *
-     * Ejemplo de uso:
-     * val user = apiService.getUserById(1)
-     */
-    @GET("users/{id}")
-    suspend fun getUserById(@Path("id") id: Int): UserDto
+    // ✅ CORRECTO: Endpoint para el detalle del paquete (NUEVO)
+    @GET("paquete-turistico/{id}")
+    suspend fun getTourPackageById(@Path("id") id: Int): PackageDto
 
-    @GET("auth/me")
-    suspend fun getProfile(): UserDto
-
-    @GET("packages") // O la ruta que hayas definido en NestJS, ej: "paquetes"
-    suspend fun getTourPackages(): List<PackageDto> // Asume que la API devuelve una lista
+    // ✅ CORRECTO: Endpoint para el itinerario (NUEVO)
+    @GET("itinerario/paquete/{paqueteId}")
+    suspend fun getItineraryByPackageId(@Path("paqueteId") packageId: Int): ItineraryDto
 
 
 }

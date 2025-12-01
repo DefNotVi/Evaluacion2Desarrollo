@@ -1,100 +1,101 @@
+// Archivo: C:/Users/Sora/AndroidStudioProjects/Evaluacion2Desarrollo/app/src/main/java/com/gwagwa/evaluacion2/viewmodel/PackageListViewModel.kt
+
 package com.gwagwa.evaluacion2.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.gwagwa.evaluacion2.data.local.SessionManager
 import com.gwagwa.evaluacion2.data.remote.RetrofitClient
 import com.gwagwa.evaluacion2.data.remote.dto.PackageDto
+import com.gwagwa.evaluacion2.data.remote.dto.UserDto
+import com.gwagwa.evaluacion2.repository.AuthRepository
 import com.gwagwa.evaluacion2.repository.PackageRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel // <-- CAMBIO de ViewModel a AndroidViewModel
-import com.gwagwa.evaluacion2.data.local.SessionManager
-import com.gwagwa.evaluacion2.repository.AuthRepository
 
-
+// 1. ESTADO DE LA UI: Define todo lo que la pantalla puede necesitar.
+// Es una única fuente de verdad para tu Composable.
 data class PackageListUiState(
-    val isLoading: Boolean = false,
-    val allPackages: List<PackageDto> = emptyList(), // La lista original de la API
-    val filteredPackages: List<PackageDto> = emptyList(), // La lista que se muestra en la UI
+    // Estado general
+    val isLoading: Boolean = true, // Inicia en `true` para mostrar un spinner al entrar.
     val error: String? = null,
-    // Estados para los filtros
+
+    // Datos
+    val profile: UserDto? = null,
+    val packages: List<PackageDto> = emptyList(),
+
+    // Estado de los filtros
     val searchQuery: String = "",
     val selectedCategory: String? = null
 )
 
 class PackageListViewModel(application: Application) : AndroidViewModel(application) {
 
-    // --- LÓGICA DE PAQUETES  ---
+    // 2. INICIALIZACIÓN: Preparamos las dependencias.
+    // Usamos `private val` para que solo el ViewModel pueda acceder a ellas.
     private val apiService = RetrofitClient.authApiService
     private val packageRepository = PackageRepository(apiService)
+    private val authRepository = AuthRepository(apiService, SessionManager(application))
 
-    // --- LÓGICA DE AUTENTICACIÓN ---
-    private val sessionManager = SessionManager(application.applicationContext)
-    private val authRepository = AuthRepository(apiService, sessionManager) // Reutilizamos el apiService
-
+    // 3. STATEFLOW: El corazón del ViewModel.
+    // `_uiState` es mutable y privada. La UI solo observa `uiState`, que es inmutable.
     private val _uiState = MutableStateFlow(PackageListUiState())
-    val uiState: StateFlow<PackageListUiState> = _uiState
+    val uiState: StateFlow<PackageListUiState> = _uiState.asStateFlow()
 
+    // 4. BLOQUE INIT: La acción principal que se dispara al crear el ViewModel.
     init {
-        fetchPackages()
+        loadInitialData()
     }
 
-    fun fetchPackages() { // Cambiado a 'public' por si necesitas recargar desde la UI
-        _uiState.update { it.copy(isLoading = true) }
+    // 5. CARGA DE DATOS: Lógica central para obtener datos de la red.
+    fun loadInitialData() {
+        // Ponemos `isLoading` a true y limpiamos errores antiguos.
+        _uiState.update { it.copy(isLoading = true, error = null) }
+
         viewModelScope.launch {
-            try {
-                val packages = packageRepository.getTourPackages()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        allPackages = packages,
-                        filteredPackages = packages // Al inicio, la lista filtrada es igual a la completa
-                    )
-                }
-            } catch (e: IOException) {
-                _uiState.update { it.copy(isLoading = false, error = "Error de red. Revisa tu conexión.") }
-            } catch (e: HttpException) { //Se usa la HttpException de Retrofit
-                _uiState.update { it.copy(isLoading = false, error = "Error del servidor.") }
+            // Usamos `runCatching` en cada llamada para que un fallo no cancele el otro.
+            // CORRECCIÓN: Se eliminaron los <> de la llamada a getProfile()
+            val profileResult = runCatching { authRepository.getProfile() }
+            val packagesResult = runCatching { packageRepository.getTourPackages() }
+
+            // Actualizamos el estado con los resultados, ya sean de éxito o de fallo.
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isLoading = false,
+                    profile = profileResult.getOrNull(), // Si falla, será null.
+                    packages = packagesResult.getOrDefault(emptyList()), // Si falla, lista vacía.
+                    // Si ALGUNO de los dos falló, mostramos un error genérico.
+                    error = if (profileResult.isFailure || packagesResult.isFailure) {
+                        "No se pudieron cargar todos los datos. Inténtalo de nuevo."
+                    } else {
+                        null // Si todo fue bien, no hay error.
+                    }
+                )
             }
         }
     }
 
-    // --- FILTROS ---
 
+    // 6. MANEJO DE EVENTOS DE LA UI: Funciones que la UI llamará.
     fun onSearchQueryChanged(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
-        applyFilters()
     }
 
     fun onCategorySelected(category: String?) {
         _uiState.update { it.copy(selectedCategory = category) }
-        applyFilters()
     }
-
-    private fun applyFilters() {
-        val state = _uiState.value
-        val filteredList = state.allPackages.filter { pkg -> // Esto usará el 'filter' estándar de Kotlin
-            // Filtro por nombre (búsqueda)
-            val matchesSearch = pkg.name.contains(state.searchQuery, ignoreCase = true)
-            // Filtro por categoría
-            val matchesCategory = state.selectedCategory == null || pkg.category == state.selectedCategory
-
-            matchesSearch && matchesCategory
-        }
-        _uiState.update { it.copy(filteredPackages = filteredList) }
-    }
-
-    // --- LOGOUT ---
 
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
-            // No necesitamos un callback aquí. La navegación se maneja en la UI.
+            // La navegación la gestionas en la UI observando un estado o un evento.
         }
     }
 }

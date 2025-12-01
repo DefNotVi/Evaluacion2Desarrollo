@@ -5,6 +5,7 @@ import com.gwagwa.evaluacion2.data.remote.ApiService
 import com.gwagwa.evaluacion2.data.remote.dto.AuthResponse
 import com.gwagwa.evaluacion2.data.remote.dto.LoginRequest
 import com.gwagwa.evaluacion2.data.remote.dto.RegisterRequest
+import com.gwagwa.evaluacion2.data.remote.dto.UserDto
 import java.io.IOException
 
 
@@ -22,21 +23,19 @@ class AuthRepository(
      sessionManager.saveAuthToken(token)
  }
 
+    suspend fun login(request: LoginRequest): AuthResponse {
+        // Llama a la API para intentar iniciar sesión
+        val response = apiService.login(request)
 
- // Asumimos que esta función está en tu AuthRepository.kt
+        //    Si la respuesta contiene un token, lo guarda en la sesión
+        response.data?.accessToken?.let { token ->
+            sessionManager.saveAuthToken(token)
+        }
 
-// Importante: Debes definir qué tipo de respuesta devuelve la API
-// Si la API devuelve un objeto con el token, úsalo aquí (ej: LoginResponse)
-// Si solo necesitas guardar el token y no devolver nada más, puedes usar Unit.
-// Lo ajustaré para que no devuelva nada, ya que el token se guarda internamente.
+        // Devuelve la respuesta completa al ViewModel
+        return response
+    }
 
- suspend fun login(request: LoginRequest) : AuthResponse {
-     // Eliminé el 'Result<Unit>' del tipo de retorno
-     val response = apiService.login(request)
-
-     // Guarda el token de acceso para futuras peticiones.
- return response
- }
 
 
 
@@ -51,7 +50,7 @@ class AuthRepository(
      * Verifica si hay un token de sesión guardado.
      */
     suspend fun isAuthenticated(): Boolean {
-        // Obtenemos el token. Si no es nulo/vacío, está autenticado.
+        // Obtiene el token, si no es nulo/vacío, está autenticado
         return !sessionManager.getAuthToken().isNullOrEmpty()
     }
 
@@ -70,6 +69,22 @@ class AuthRepository(
         }
         return response
     }
+
+    suspend fun getProfile(): UserDto {
+        //    Llama a la API
+        //    ahora devuelve un "ProfileResponse"
+        val response = apiService.getProfile()
+
+        //    Comprueba si la API indicó éxito y devuelve solo el UserDto
+        //    que está dentro del campo "data"
+        if (response.success) {
+            return response.data
+        } else {
+            // Si la API dice que falló, lanza una excepción
+            throw IOException("La API indicó un fallo al obtener el perfil.")
+        }
+    }
+
 
 
 }

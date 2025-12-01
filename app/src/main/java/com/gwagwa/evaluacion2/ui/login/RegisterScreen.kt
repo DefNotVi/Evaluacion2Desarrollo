@@ -7,88 +7,77 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gwagwa.evaluacion2.viewmodel.LoginRegisterViewModel
-
 
 @Composable
 fun RegisterScreen(
-    onRegistrationSuccess: () -> Unit,
-    onNavigateBack: () -> Unit,
-    viewModel: LoginRegisterViewModel = viewModel()
+    viewModel: LoginRegisterViewModel,
+    onNavigateBack: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
-
-    // Si el registro fue exitoso, navegamos
-    LaunchedEffect(state.isRegistrationSuccess) {
-        if (state.isRegistrationSuccess) {
-            // Aquí lleva al Login de nuevo para usar un usuario existente
-            onNavigateBack()
-            viewModel.resetState()
-        }
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Crear Cuenta (Registro)", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(40.dp))
+        Text("Crear Cuenta", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo Usuario
+        // Campo de Nombre
         OutlinedTextField(
-            value = state.name,
-            onValueChange = viewModel::updateName,
-            label = { Text("Nombre del Usuario") },
-            modifier = Modifier.fillMaxWidth()
+            value = uiState.name,
+            onValueChange = { viewModel.onNameChange(it) },
+            label = { Text("Nombre") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.error != null
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Campo de Email
+        OutlinedTextField(
+            value = uiState.email,
+            onValueChange = { viewModel.onEmailChange(it) },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.error != null
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Campo de Contraseña
+        OutlinedTextField(
+            value = uiState.password,
+            onValueChange = { viewModel.onPasswordChange(it) },
+            label = { Text("Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = uiState.error != null
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo email
-        OutlinedTextField(
-            value = state.email,
-            onValueChange = viewModel::updateEmail,
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Campo Contraseña
-        OutlinedTextField(
-            value = state.password,
-            onValueChange = viewModel::updatePassword,
-            label = { Text("Contraseña (use al menos una letra y numero)") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-
-        state.error?.let {
+        uiState.error?.let {
             Text(it, color = MaterialTheme.colorScheme.error)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Botón Registro
+        // Botón de Registro
         Button(
-            onClick = viewModel::register,
-            enabled = !state.isLoading,
-            modifier = Modifier.fillMaxWidth().height(56.dp)
+            onClick = { viewModel.register() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
             } else {
-                Text("Registrarme")
+                Text("Registrarse")
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón Volver
+        // Botón para volver atrás
         TextButton(onClick = onNavigateBack) {
-            Text("Ya tengo cuenta (Volver a Login)")
+            Text("¿Ya tienes una cuenta? Inicia sesión")
         }
     }
 }
-

@@ -7,79 +7,74 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gwagwa.evaluacion2.viewmodel.LoginRegisterViewModel
+
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    viewModel: LoginRegisterViewModel = viewModel()
+    // AHORA RECIBE EL VIEWMODEL COMPLETO
+    viewModel: LoginRegisterViewModel,
+    onNavigateToRegister: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.checkIfUserIsLoggedIn()
-    }
-
-    LaunchedEffect(state.isLoginSuccess) {
-        if (state.isLoginSuccess) {
-            onLoginSuccess()
-            viewModel.resetState()
-        }
-    }
+    // SE OBTENE EL ESTADO DIRECTAMENTE DEL VIEWMODEL
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Iniciar Sesión (TravelGo)", style = MaterialTheme.typography.headlineMedium)
+        Text("Iniciar Sesión", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo Usuario
+        // Campo de Email
         OutlinedTextField(
-            value = state.username,
-            onValueChange = viewModel::updateUsername,
-            label = { Text("Usuario (email)") },
-            modifier = Modifier.fillMaxWidth()
+            value = uiState.email,
+            // LLAMA AL EVENTO DEL VIEWMODEL
+            onValueChange = { viewModel.onEmailChange(it) },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.error != null
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Campo de Contraseña
+        OutlinedTextField(
+            value = uiState.password,
+            //  LLAMA AL EVENTO DEL VIEWMODEL
+            onValueChange = { viewModel.onPasswordChange(it) },
+            label = { Text("Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = uiState.error != null
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Contraseña
-        OutlinedTextField(
-            value = state.password,
-            onValueChange = viewModel::updatePassword,
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        state.error?.let {
+        // Muestra el mensaje de error si existe
+        uiState.error?.let {
             Text(it, color = MaterialTheme.colorScheme.error)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Botón Login
+        // Botón de Login
         Button(
-            onClick = viewModel::login,
-            enabled = !state.isLoading,
-            modifier = Modifier.fillMaxWidth().height(56.dp)
+            // LLAMA A LA FUNCIÓN DE LOGIN DEL VIEWMODEL
+            onClick = { viewModel.login() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading // Deshabilitar mientras carga
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
             } else {
-                Text("Ingresar")
+                Text("Login")
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Navegar a Registro
+        // Botón para ir a Registro
         TextButton(onClick = onNavigateToRegister) {
-            Text("¿No tienes cuenta? Regístrate")
+            Text("¿No tienes una cuenta? Regístrate")
         }
     }
 }

@@ -32,7 +32,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     // Repositorio de la API
     // Nota: El UserRepository ya está configurado para devolver datos simulados
-    private val userRepository = UserRepository(application.applicationContext)
+    private val userRepository = UserRepository()
 
     // Repositorio de DataStore para el avatar
     private val avatarRepository = AvatarRepository(application.applicationContext)
