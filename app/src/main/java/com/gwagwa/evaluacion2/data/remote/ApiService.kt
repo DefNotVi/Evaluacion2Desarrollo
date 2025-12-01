@@ -70,4 +70,9 @@ interface ApiService {
 
     @GET("auth/me")
     suspend fun getProfile(): UserDto
+
+    @GET("packages") // O la ruta que hayas definido en NestJS, ej: "paquetes"
+    suspend fun getTourPackages(): List<PackageDto> // Asume que la API devuelve una lista
+
+
 }

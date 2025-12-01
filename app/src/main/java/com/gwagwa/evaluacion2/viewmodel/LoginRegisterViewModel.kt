@@ -184,16 +184,22 @@ class LoginRegisterViewModel(application: Application) : AndroidViewModel(applic
 
 
             } catch (e: Exception) {
-                // Este bloque 'catch' ahora maneja correctamente errores y no manda al login cuando hay error
                 val mensajeError = when (e) {
                     is HttpException -> {
-                        "Error en las credenciales, porfavor revise la contraseña y que el email esté bien escrito o no esté ya registrado"
+                        // Intenta obtener un mensaje más detallado del servidor
+                        val errorBody = e.response()?.errorBody()?.string()
+                        if (errorBody != null && errorBody.contains("email_1 unique constraint")) { // Ejemplo si usas Prisma/NestJS
+                            "Este correo electrónico ya está registrado."
+                        } else {
+                            // Si no, usa el mensaje genérico
+                            "Error del servidor (${e.code()}). Revisa que los datos cumplan los requisitos."
+                        }
                     }
                     is IOException -> {
-                        "No se pudo conectar al servidor. Revisa tu conexión a internet"
+                        "No se pudo conectar al servidor. Revisa tu conexión a internet."
                     }
                     else -> {
-                        "Ocurrió un error inesperado"
+                        "Ocurrió un error inesperado: ${e.message}"
                     }
                 }
 
@@ -211,8 +217,5 @@ class LoginRegisterViewModel(application: Application) : AndroidViewModel(applic
             _uiState.update { it.copy(isRegistrationSuccess = true) }*/
         }
 
-        fun resetState() {
-            _uiState.update { AuthUiState() }
-        }
     }
 }

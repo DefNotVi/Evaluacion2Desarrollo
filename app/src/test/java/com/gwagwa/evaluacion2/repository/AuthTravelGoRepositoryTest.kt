@@ -6,9 +6,11 @@ import com.gwagwa.evaluacion2.data.local.SessionManager
 import com.gwagwa.evaluacion2.data.remote.ApiService
 import com.gwagwa.evaluacion2.data.remote.dto.AuthResponse
 import com.gwagwa.evaluacion2.data.remote.dto.LoginRequest
+import com.gwagwa.evaluacion2.data.remote.dto.RegisterRequest
 import com.gwagwa.evaluacion2.data.remote.dto.UserDto
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -20,8 +22,10 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import java.io.IOException
 
 
 class AuthRepositoryTest {
@@ -145,19 +149,81 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun `login con error de red debe retornar Failure con mensaje de error`() = runTest {
+    fun `login con error de red debe lanzar una excepcion`() = runTest {
         // Given
-        coEvery {
-            mockApiService.login(any())
-        } throws Exception("Network error")
+        val request = LoginRequest("test@example.com", "password")
+
+        // --- CORRECCIÓN CLAVE ---
+        // Simulamos que mockApiService.login lanza una excepción directamente
+        coEvery { mockApiService.login(request) } throws RuntimeException("Error de Red")
+
+        // When & Then
+        // Usamos assertFailsWith para verificar que el código dentro de las llaves {}
+        // lanza la excepción que esperamos. El test pasará si lo hace, y fallará si no.
+        val exception = assertFailsWith<RuntimeException> {
+            repository.login(request)
+        }
+
+        // Finalmente, verificamos que el mensaje de la excepción es el correcto.
+        assertEquals("Error de Red", exception.message)
+    }
+
+
+    // ==================== REGISTER TESTS ====================
+    @Test
+    fun `registro exitoso debe guardar el token`() = runTest {
+        // Given
+        val request = RegisterRequest(
+            name = "Nuevo Usuario",
+            email = "nuevo@example.com",
+            password = "password123",
+            role = "CLIENTE"
+        )
+        val token = "new_token_12345"
+        val apiResponse = AuthResponse(true, "Registro exitoso", AuthResponse.AuthDataDto(mockk(), token))
+
+        coEvery { mockApiService.register(request) } returns apiResponse
 
         // When
-        val result = repository.login(LoginRequest("test@example.com", "password")
+        repository.register(request)
 
         // Then
-        assertTrue(result.isFailure)
-        assertTrue(
-            result.exceptionOrNull()?.message?.contains("Error de red") == true
+        // Esto ahora funcionará porque el 'setup' inyecta el mock correcto.
+        coVerify(exactly = 1) { mockSessionManager.saveAuthToken(token) }
+    }
+
+    @Test
+    fun `registro con email duplicado debe lanzar IOException`() = runTest {
+        // Given
+        val request = RegisterRequest(
+            name = "Test User",
+            email = "existing@example.com",
+            password = "password123",
+            role = "CLIENTE"
         )
+        val apiResponse = AuthResponse(
+            success = false,
+            message = "El email ya está registrado",
+            data = null
+        )
+        coEvery { mockApiService.register(request) } returns apiResponse
+
+        // When & Then
+        val exception = assertFailsWith<IOException> {
+            repository.register(request)
+        }
+        assertEquals("El email ya está registrado", exception.message)
+    }
+
+    @Test
+    fun `logout debe llamar a clearAuthToken del SessionManager`() = runTest {
+        // Given: No se necesita ninguna preparación especial, el repositorio ya está creado.
+
+        // When: Ejecutamos la función de logout en el repositorio.
+        repository.logout()
+
+        // Then: Verificamos que la función 'clearAuthToken' del mockSessionManager
+        //       fue llamada exactamente una vez.
+        coVerify(exactly = 1) { mockSessionManager.clearAuthToken() }
     }
 }

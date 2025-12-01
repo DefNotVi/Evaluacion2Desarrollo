@@ -5,6 +5,7 @@ import com.gwagwa.evaluacion2.data.remote.ApiService
 import com.gwagwa.evaluacion2.data.remote.dto.AuthResponse
 import com.gwagwa.evaluacion2.data.remote.dto.LoginRequest
 import com.gwagwa.evaluacion2.data.remote.dto.RegisterRequest
+import java.io.IOException
 
 
 class AuthRepository(
@@ -57,10 +58,17 @@ class AuthRepository(
     /**
      * Lógica de Registro: Llama a la API, recibe el token y guarda la sesión.
      */
-    suspend fun register(request: RegisterRequest) : AuthResponse {
-        // Ahora simplemente llama a la función de la API y devuelve su resultado
-        // El bloque try-catch lo moví al LoginViewModel
-        return apiService.register(request)
+    suspend fun register(registerRequest: RegisterRequest): AuthResponse {
+        val response = apiService.register(registerRequest)
+        if (!response.success) {
+            // Lanzamos la excepción si el registro no fue exitoso
+            // DESPUÉS
+            throw IOException(response.message)
+        }
+        response.data?.accessToken?.let { token ->
+            sessionManager.saveAuthToken(token)
+        }
+        return response
     }
 
 
