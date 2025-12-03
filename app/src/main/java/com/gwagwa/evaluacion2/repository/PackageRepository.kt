@@ -12,7 +12,7 @@ class PackageRepository(private val apiService: ApiService) {
 
         // Comprueba si la respuesta fue exitosa y devuelve solo la lista de datos
         if (response.success) {
-            return response.data // <-- CAMBIO: Devuelve la lista que está dentro
+            return response.data // <-- Devuelve la lista que está dentro
         } else {
             // Si la API dice que no fue exitoso, lanza un error
             throw IOException("La API indicó un fallo en la respuesta de paquetes.")

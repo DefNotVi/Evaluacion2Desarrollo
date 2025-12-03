@@ -1,17 +1,25 @@
-package com.gwagwa.evaluacion2.data.remote.dto;
+package com.gwagwa.evaluacion2.data.remote.dto
+
+import com.google.gson.annotations.SerializedName
 
 data class PackageDto(
-        val id: Int,
-        val name: String,    val description: String,
-        val price: Double,
-        val category: String, // ej: "Aventura", "Playa", "Cultural"
-        val imageUrl: String, // Una URL a una imagen del paquete
-        val itinerary: List<ItineraryItemDto>
-)
 
-data class ItineraryItemDto(
-        val day: Int,
-        val title: String,
-        val description: String
-)
+    @SerializedName("_id")
+    val id: String, // Cambiado de Int a String, ya que _id es un ObjectId
 
+    @SerializedName("nombre")
+    val name: String,
+
+    @SerializedName("descripcion")
+    val description: String,
+
+    @SerializedName("imagen")
+    val imageUrl: String? = null,
+
+    @SerializedName("precio")
+    val price: Double,
+
+    // Usa el campo "destino" como "category" para los filtros
+    @SerializedName("destino")
+    val category: String,
+)
