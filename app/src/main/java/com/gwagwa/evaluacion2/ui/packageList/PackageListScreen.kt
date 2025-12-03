@@ -1,5 +1,7 @@
 package com.gwagwa.evaluacion2.ui.packageList
 
+// Importaciones necesarias
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,18 +24,24 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.remember
-
-// Nuevos imports para manejar imágenes remotas
+import androidx.compose.ui.graphics.Color
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import java.util.Locale
+import java.text.NumberFormat // Importación para formatear el Double a Moneda
 
-//   PUNTO DE ENTRADA PRINCIPAL: La pantalla completa
+// ----------------------------------------------------------------------
+// 1. PUNTO DE ENTRADA PRINCIPAL: PackageListScreen
+// ----------------------------------------------------------------------
+
 @Composable
 fun PackageListScreen(
     viewModel: PackageListViewModel = viewModel(),
-    onPackageClick: (Int) -> Unit,
+    // *** CORRECCIÓN CRÍTICA: onPackageClick ahora espera un String para el ID ***
+    onPackageClick: (String) -> Unit,
     onProfileClick: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -58,16 +66,16 @@ fun PackageListScreen(
                 .fillMaxSize()
         ) {
 
-            // BÚSQUEDA Y FILTROS (Se habilita la lógica de chips)
+            // BÚSQUEDA Y FILTROS
             SearchAndFilterSection(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChanged = viewModel::onSearchQueryChanged,
-                uniqueCategories = viewModel.getUniqueCategories(), // Ahora lista destinos reales
+                uniqueCategories = viewModel.getUniqueCategories(),
                 selectedCategory = uiState.selectedCategory,
                 onCategorySelected = viewModel::onCategorySelected
             )
 
-            // El contenido de la pantalla cambia según el estado (Cargando, Error, Éxito)
+            // Contenido de la pantalla (Cargando, Error, Éxito)
             when {
                 uiState.isLoading -> {
                     LoadingState()
@@ -76,15 +84,58 @@ fun PackageListScreen(
                     ErrorState(message = uiState.error)
                 }
                 else -> {
-                    // Si todo está bien, muestra la lista de paquetes
                     SuccessState(
-                        packages = filteredPackages, // Usamos la lista filtrada
+                        packages = filteredPackages,
                         onPackageClick = onPackageClick
                     )
                 }
             }
         }
     }
+}
+
+// ----------------------------------------------------------------------
+// 2. COMPONENTES AUXILIARES
+// ----------------------------------------------------------------------
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PackageListTopBar(
+    username: String?,
+    onLogoutClick: () -> Unit,
+    onProfileClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            val displayName = remember(username) { username?.substringBefore('@')?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() } }
+            Column(horizontalAlignment = Alignment.Start) {
+                Text("TravelApp", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    if (displayName != null) "Hola, $displayName" else "Paquetes Turísticos",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onProfileClick) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Ir al Perfil"
+                )
+            }
+            IconButton(onClick = onLogoutClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Cerrar Sesión"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    )
 }
 
 @Composable
@@ -96,11 +147,10 @@ private fun SearchAndFilterSection(
     onCategorySelected: (String?) -> Unit
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        // 1. Barra de Búsqueda
         OutlinedTextField(
             value = searchQuery,
             onValueChange = onSearchQueryChanged,
-            label = { Text("Buscar paquete por nombre") },
+            label = { Text("Buscar paquete por nombre o destino") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
@@ -113,29 +163,32 @@ private fun SearchAndFilterSection(
             singleLine = true
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // 2. Chips de Categorías (se mostrarán si hay destinos reales en uniqueCategories)
         if (uniqueCategories.isNotEmpty() || selectedCategory != null) {
-            Text("Filtrar por Destino:", style = MaterialTheme.typography.labelMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                "Filtrar por Destino:",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                // "Mostrar Todos" (Limpiar filtro)
+                val isAllSelected = selectedCategory == null
                 AssistChip(
                     onClick = { onCategorySelected(null) },
                     label = { Text("Todos") },
                     colors = AssistChipDefaults.assistChipColors(
-                        containerColor = if (selectedCategory == null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        labelColor = if (selectedCategory == null) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                        containerColor = if (isAllSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = if (isAllSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
 
-                // Chips para cada categoría (destino) única
                 uniqueCategories.forEach { category ->
                     FilterChip(
                         selected = selectedCategory == category,
@@ -145,6 +198,10 @@ private fun SearchAndFilterSection(
                         },
                         label = { Text(category) },
                         modifier = Modifier.wrapContentWidth(),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
                     )
                 }
             }
@@ -153,23 +210,26 @@ private fun SearchAndFilterSection(
     }
 }
 
-
 @Composable
 private fun LoadingState() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Cargando paquetes...")
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Cargando paquetes...")
+        }
     }
 }
 
 @Composable
 private fun ErrorState(message: String?) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -183,11 +243,16 @@ private fun ErrorState(message: String?) {
 @Composable
 private fun SuccessState(
     packages: List<PackageDto>,
-    onPackageClick: (Int) -> Unit
+    // onPackageClick espera String
+    onPackageClick: (String) -> Unit
 ) {
     if (packages.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No se encontraron paquetes con los criterios de búsqueda actuales.")
+            Text(
+                "No se encontraron paquetes con los criterios de búsqueda actuales.",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(32.dp)
+            )
         }
     } else {
         LazyColumn(
@@ -197,50 +262,18 @@ private fun SuccessState(
         ) {
             items(
                 items = packages,
-                key = { it.id }
+                key = { it.id } // Clave robusta (String)
             ) { pkg ->
-                PackageCard(packageDto = pkg, onClick = { onPackageClick(pkg.id.hashCode()) })
+                // *** CORRECCIÓN FINAL: onPackageClick recibe pkg.id (String) ***
+                PackageCard(packageDto = pkg, onClick = { onPackageClick(pkg.id) })
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PackageListTopBar(
-    username: String?,
-    onLogoutClick: () -> Unit,
-    onProfileClick: () -> Unit
-) {
-    TopAppBar(
-        title = {
-            val displayName = remember(username) { username?.substringBefore('@') }
-            Text(if (displayName != null) "Hola, $displayName" else "Paquetes Turísticos")
-        },
-
-
-        actions = {
-
-            IconButton(onClick = onProfileClick) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Ir al Perfil"
-                )
-            }
-
-            IconButton(onClick = onLogoutClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Cerrar Sesión"
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    )
-}
+// ----------------------------------------------------------------------
+// 3. COMPONENTE CARD (Con manejo de Double para el precio)
+// ----------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -248,66 +281,110 @@ private fun PackageCard(
     packageDto: PackageDto,
     onClick: () -> Unit
 ) {
-    // DONDE ESTÁN ALOJADAS LAS IMÁGENES DE 'uploads/...'
+    // URL BASE DE LA IMAGEN
     val BASE_URL_IMAGE = "https://travelgo-api-1.onrender.com/"
+
+    // Formateador de moneda (ejemplo para usar con el Double)
+    val currencyFormatter = remember {
+        NumberFormat.getCurrencyInstance(Locale("es", "CL")) // Puedes ajustar la Locale
+    }
+
+    // Prepara la URL completa de la imagen
+    val fullImageUrl = remember(packageDto.imageUrl) {
+        if (packageDto.imageUrl?.startsWith("http") == true) {
+            packageDto.imageUrl
+        } else if (packageDto.imageUrl != null) {
+            BASE_URL_IMAGE + packageDto.imageUrl.trimStart('/')
+        } else {
+            null
+        }
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         onClick = onClick
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-
-            // IMAGEN (Si está disponible)
-            if (packageDto.imageUrl != null) {
-
-                // CONSTRUIMOS LA URL COMPLETA
-                val fullImageUrl = if (packageDto.imageUrl.startsWith("http")) {
-                    packageDto.imageUrl // Ya es una URL completa
+        Column {
+            // IMAGEN O FALLBACK
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (fullImageUrl != null) {
+                    AsyncImage(
+                        model = fullImageUrl,
+                        contentDescription = "Imagen de ${packageDto.name}",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
                 } else {
-                    // Concatenamos la URL base y el path relativo (ej: "uploads/...")
-                    BASE_URL_IMAGE + packageDto.imageUrl.trimStart('/')
+                    // Alternativa si no hay URL de imagen (Fallback)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🏞️ Sin imagen disponible", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
-
-                AsyncImage(
-                    model = fullImageUrl, // Usamos la URL completa
-                    contentDescription = "Imagen de ${packageDto.name}",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp), // Altura fija para la imagen
-                    contentScale = ContentScale.Crop, // Asegura que la imagen cubra el área
-                )
-                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Título
-            Text(text = packageDto.name, style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(8.dp))
 
-            // Destino (Categoría)
-            Text(text = "Destino: ${packageDto.category}", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
 
-            // Precio
-            Text(text = "Precio: $${packageDto.price}", style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary))
-            Spacer(modifier = Modifier.height(8.dp))
+                // Destino (Categoría como etiqueta)
+                AssistChip(
+                    onClick = { /* No-op */ },
+                    label = { Text(packageDto.category) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    modifier = Modifier.wrapContentWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // 2. DESCRIPCIÓN (Usada como itinerario)
-            HorizontalDivider(modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Descripción / Itinerario: ",
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = packageDto.description,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3, // Limita la descripción para que no ocupe demasiado espacio en la lista.
-                overflow = TextOverflow.Ellipsis // Agrega "..." si se trunca
-            )
+                // Título
+                Text(
+                    text = packageDto.name,
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // NOTA: Para ver la descripción completa, el usuario tendrá que hacer clic en la tarjeta (onClick)
-            // lo que llevaría a la pantalla de detalle del paquete.
+                // Precio (Destacado)
+                Text(
+                    // Usamos el Double y lo formateamos a String de moneda
+                    text = currencyFormatter.format(packageDto.price),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // DESCRIPCIÓN (Itinerario)
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Itinerario:",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = packageDto.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
