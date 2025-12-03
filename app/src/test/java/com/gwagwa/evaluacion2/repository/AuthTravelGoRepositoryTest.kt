@@ -153,18 +153,17 @@ class AuthRepositoryTest {
         // Given
         val request = LoginRequest("test@example.com", "password")
 
-        // --- CORRECCIÓN CLAVE ---
         // Simulamos que mockApiService.login lanza una excepción directamente
         coEvery { mockApiService.login(request) } throws RuntimeException("Error de Red")
 
         // When & Then
-        // Usamos assertFailsWith para verificar que el código dentro de las llaves {}
-        // lanza la excepción que esperamos. El test pasará si lo hace, y fallará si no.
+        // Usam assertFailsWith para verificar que el código dentro de las llaves {}
+        // lanza la excepción, el test pasará si lo hace, y fallará si no
         val exception = assertFailsWith<RuntimeException> {
             repository.login(request)
         }
 
-        // Finalmente, verificamos que el mensaje de la excepción es el correcto.
+        // Finalmente, verifica que el mensaje de la excepción es el correcto
         assertEquals("Error de Red", exception.message)
     }
 
@@ -188,7 +187,7 @@ class AuthRepositoryTest {
         repository.register(request)
 
         // Then
-        // Esto ahora funcionará porque el 'setup' inyecta el mock correcto.
+        // Esto ahora funcionará porque el 'setup' inyecta el mock correcto
         coVerify(exactly = 1) { mockSessionManager.saveAuthToken(token) }
     }
 

@@ -31,7 +31,6 @@ class AuthInterceptor(
             sessionManager.getAuthToken()
         }
 
-        println("token: $token")
 
         // Modificar la petición SOLO si hay un token
         val requestToProceed = if (!token.isNullOrEmpty()) {

@@ -49,8 +49,8 @@ interface ApiService {
     suspend fun getTourPackageById(@Path("id") id: Int): PackageDto
 
     // ✅ CORRECTO: Endpoint para el itinerario (NUEVO)
-    @GET("itinerario/paquete/{paqueteId}")
-    suspend fun getItineraryByPackageId(@Path("paqueteId") packageId: Int): ItineraryDto
+   /* @GET("itinerario/paquete/{paqueteId}")
+    suspend fun getItineraryByPackageId(@Path("paqueteId") packageId: Int): ItineraryDto*/
 
 
 }
