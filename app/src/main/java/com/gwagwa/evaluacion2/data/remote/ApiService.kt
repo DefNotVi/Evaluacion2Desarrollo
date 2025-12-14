@@ -2,6 +2,7 @@ package com.gwagwa.evaluacion2.data.remote
 
 import com.gwagwa.evaluacion2.data.remote.dto.*
 import retrofit2.http.*
+import retrofit2.Response
 
 /**
  * Define los endpoints de tu API
@@ -34,8 +35,8 @@ interface ApiService {
      * Ejemplo de uso:
      * val currentUser = apiService.getCurrentUser()
      */
-    @GET("auth/profile")
-    suspend fun getProfile(): ProfileResponse
+    @GET("cliente-profile/me")
+    suspend fun getProfile(): ProfileDetailsDto
 
     @GET("paquete-turistico/disponibles")
     suspend fun getAvailableTourPackages(): PackageResponse
@@ -48,9 +49,18 @@ interface ApiService {
     @GET("paquete-turistico/{id}")
     suspend fun getTourPackageById(@Path("id") id: Int): PackageDto
 
-    // ✅ CORRECTO: Endpoint para el itinerario (NUEVO)
-   /* @GET("itinerario/paquete/{paqueteId}")
-    suspend fun getItineraryByPackageId(@Path("paqueteId") packageId: Int): ItineraryDto*/
+    @GET("auth/users")
+    suspend fun getAllUsers(): AllUsersResponse
+
+    @PUT("cliente-profile/me")
+    // Al actualizar, espera la nueva versión del perfil (ProfileDetailsDto) como respuesta
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): ProfileDetailsDto
+
+    //  Endpoint para crear un nuevo paquete (POST)
+    @POST("paquete-turistico")
+
+    suspend fun createPackage(@Body request: CreatePackageRequest): PackageDto
+
 
 
 }

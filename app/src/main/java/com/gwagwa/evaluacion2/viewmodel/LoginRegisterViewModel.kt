@@ -17,14 +17,15 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-// --- Estado de la UI Simplificado y Correcto ---
+// --- Estado de la UI Simplificado---
 data class AuthUiState(
     val email: String = "",
     val name: String = "", // Usado para el campo 'nombre' del registro
     val password: String = "",
     val isLoading: Boolean = false,
-    val authSuccess: Boolean = false, // Un solo flag para gobernar el éxito
-    val error: String? = null
+    val authSuccess: Boolean = false,
+    val error: String? = null,
+    val userRole: String? = null
 )
 
 class LoginRegisterViewModel(application: Application) : AndroidViewModel(application) {
@@ -49,8 +50,11 @@ class LoginRegisterViewModel(application: Application) : AndroidViewModel(applic
      */
     fun checkIfUserIsLoggedIn() {
         viewModelScope.launch {
+            val token = sessionManager.authToken.first()
             // .first() es una forma segura de obtener el primer valor del Flow
-            if (!sessionManager.authToken.first().isNullOrBlank()) {
+            if (!token.isNullOrBlank()) {
+                // Si hay un token, también leemos el rol guardado
+                val role = sessionManager.userRole.first()
                 _uiState.update { it.copy(authSuccess = true) }
             }
         }
@@ -77,8 +81,12 @@ class LoginRegisterViewModel(application: Application) : AndroidViewModel(applic
                 // El repositorio ahora se encarga de guardar el token internamente.
                 authRepository.login(request)
 
+                // Lee el rol que se acaba de guardar desde el SessionManager
+                val userRole = sessionManager.userRole.first()
+
+
                 // Si la línea anterior no lanzó una excepción, el login fue exitoso.
-                _uiState.update { it.copy(isLoading = false, authSuccess = true) }
+                _uiState.update { it.copy(isLoading = false, authSuccess = true, userRole = userRole) }
 
             } catch (e: Exception) {
                 handleAuthError(e)
@@ -106,8 +114,11 @@ class LoginRegisterViewModel(application: Application) : AndroidViewModel(applic
                 // El repositorio ya guarda el token automáticamente si el registro es exitoso.
                 authRepository.register(request)
 
+                // Lee el rol del nuevo usuario
+                val userRole = sessionManager.userRole.first()
+
                 // Si no hay excepción, el registro fue exitoso.
-                _uiState.update { it.copy(isLoading = false, authSuccess = true) }
+                _uiState.update { it.copy(isLoading = false, authSuccess = true, userRole = userRole) }
 
             } catch (e: Exception) {
                 handleAuthError(e, isRegister = true)

@@ -22,6 +22,30 @@ data class UserDto(
     @SerializedName("isActive")
     val isActive: Boolean,
 
+    // CAMPOS NUEVOS
+    @SerializedName("emailVerified")
+    val emailVerified: Boolean,
+
+    @SerializedName("nombre")
+    val nombre: String,
+
+    @SerializedName("telefono")
+    val telefono: String?,
+
+    @SerializedName("direccion")
+    val direccion: String?,
+
+    @SerializedName("profileId")
+    val profileId: String?,
+
+    @SerializedName("documentoIdentidad")
+    val documentoIdentidad: String? = null,
+
+    @SerializedName("preferencias")
+    val preferencias: List<String>? = null,
+
+    // fin de campos nuevos :)
+
     @SerializedName("avatarUrl")
     val avatarUrl: String? = null,
 )
