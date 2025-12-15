@@ -36,11 +36,11 @@
 
 **Estructura carpetas:**
 
-- **ui/:** Contiene las pantallas “Composables” y sus respectivos ViewModels (login, profile), es basicamente la capa de presentación
+- **ui/:** Contiene las pantallas “Composables” y sus respectivos ViewModels, es basicamente la capa de presentación
 
-- **repository/:** Abstrae el origen de los datos (red o local), incluye UserRepository, AuthRepository y AvatarRepository
+- **repository/:** Abstrae el origen de los datos (red o local), incluye PackageRepository, AuthRepository y AvatarRepository
 
-- **data/local/:** Gestiona la persistencia local de la sesión (SessionManager con DataStore) y el URI del Avatar
+- **data/local/:** Gestiona la persistencia local de la sesión (SessionManager con DataStore), el URI del Avatar, el id del usuario, el email del usuario y su respectivo rol
 
 - **data/remote/:** Define la comunicación con la API (ApiService), modelos de datos (DTOs) y el interceptor de autenticación (AuthInterceptor)
 
