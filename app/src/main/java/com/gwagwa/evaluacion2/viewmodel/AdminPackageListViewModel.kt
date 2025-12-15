@@ -30,7 +30,7 @@ class AdminPackageListViewModel(application: Application) : AndroidViewModel(app
     val uiState: StateFlow<AdminPackageUiState> = _uiState.asStateFlow()
 
     init {
-        // Al iniciar, cargamos los datos del perfil del administrador
+        // Al iniciar, carga los datos del perfil del administrador
         loadAdminProfile()
     }
 

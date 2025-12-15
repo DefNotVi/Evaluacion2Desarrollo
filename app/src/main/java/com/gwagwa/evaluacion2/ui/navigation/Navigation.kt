@@ -150,9 +150,7 @@ fun AppNavigation() {
             )
         }
 
-        // ==========================================================
-        // ✅ NUEVA RUTA: PANTALLA DE EDICIÓN DE PERFIL
-        // ==========================================================
+        // PANTALLA DE EDICIÓN DE PERFIL
         composable(AppDestinations.EDIT_PROFILE) {
             // Nota: Usamos el mismo ProfileViewModel si queremos compartir datos
             EditProfileScreen(
@@ -160,7 +158,7 @@ fun AppNavigation() {
                     navController.popBackStack()
                 },
                 onProfileUpdated = {
-                    // Cuando el guardado es exitoso, volvemos a la pantalla de vista
+                    // Cuando el guardado es exitoso, se vuelve a la pantalla de vista
                     navController.popBackStack()
                 }
             )

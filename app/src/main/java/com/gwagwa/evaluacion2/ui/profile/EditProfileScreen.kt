@@ -23,7 +23,7 @@ import com.gwagwa.evaluacion2.viewmodel.ProfileViewModel
 @Composable
 fun EditProfileScreen(
     onNavigateBack: () -> Unit,
-    onProfileUpdated: () -> Unit, // Callback para volver después de guardar
+    onProfileUpdated: () -> Unit, // Para volver después de guardar
     // Usa el mismo ViewModel que la pantalla de vista para compartir el estado
     viewModel: ProfileViewModel = viewModel()
 ) {
@@ -124,7 +124,7 @@ fun EditProfileScreen(
                 singleLine = true
             )
 
-            // Aquí iría el coso para editar la lista de Preferencias (puede ser un desafío mayor)
+            // Aquí iría el coso para editar la lista de Preferencias o algo
 
             Spacer(modifier = Modifier.height(16.dp))
 

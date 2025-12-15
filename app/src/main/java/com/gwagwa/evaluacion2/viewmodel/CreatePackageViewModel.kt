@@ -24,7 +24,7 @@ data class CreatePackageUiState(
     // Estado de la operación
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isPackageCreated: Boolean = false // Flag para indicar éxito
+    val isPackageCreated: Boolean = false
 )
 
 class CreatePackageViewModel : ViewModel() {
@@ -40,7 +40,7 @@ class CreatePackageViewModel : ViewModel() {
 
     // Función unificada para manejar todos los cambios de campo
     fun updateField(value: String, fieldName: String) {
-        // Resetear la bandera de éxito y errores al cambiar un campo
+        // Resetear el coso de éxito y errores al cambiar un campo
         _uiState.update { currentState ->
             when (fieldName) {
                 "nombre" -> currentState.copy(nombre = value, error = null, isPackageCreated = false)
@@ -57,8 +57,6 @@ class CreatePackageViewModel : ViewModel() {
     fun resetState() {
         _uiState.value = CreatePackageUiState()
     }
-
-    // --- LÓGICA DE NEGOCIO ---
 
     fun createPackage() {
         val state = _uiState.value
@@ -85,10 +83,11 @@ class CreatePackageViewModel : ViewModel() {
                     duracionDias = duracionInt
                 )
 
-                // Llamada a la API (Asume éxito si no lanza excepción)
+                // Llamada a la API (Asume que está bien si no lanza excepción)
                 apiService.createPackage(request)
 
-                // Éxito: Resetea el formulario y pone la Flag
+                // Resetea el formulario y avisa de éxito
+                resetState()
                 _uiState.update {
                     CreatePackageUiState(isPackageCreated = true)
                 }

@@ -29,7 +29,7 @@ fun RegisterScreen(
 
 
 
-    // 💡 Usa Surface para dar un fondo y elevación si es necesario (mantendré el diseño centrado)
+    //  Usa Surface para dar un fondo y elevación si es necesario
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background // Fondo del tema

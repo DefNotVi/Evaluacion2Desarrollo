@@ -7,7 +7,6 @@ import android.net.Uri
 import com.gwagwa.evaluacion2.data.local.SessionManager
 import com.gwagwa.evaluacion2.data.remote.RetrofitClient
 import com.gwagwa.evaluacion2.repository.AuthRepository
-import com.gwagwa.evaluacion2.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -106,8 +105,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
 
     /**
-     * Carga los datos del usuario desde la SIMULACIÓN del repositorio.
-     * Ya no usa response<T>, por lo que el manejo es directo con try-catch.
+     * Carga los datos del usuario desde el AuthRepository
+     * El manejo es directo con try-catch.
      */
     fun loadUser() {
         // Indicar que está cargando usando .update{}

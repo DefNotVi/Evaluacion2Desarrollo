@@ -39,7 +39,7 @@ fun CreatePackageScreen(
                 actionLabel = "OK",
                 duration = SnackbarDuration.Short
             )
-            // Navegar hacia atrás automáticamente después de un breve retraso
+            // Navegar hacia atrás automáticamente después de un retraso pequeño
             delay(1500)
             onNavigateBack()
         }
@@ -100,7 +100,7 @@ fun CreatePackageScreen(
             OutlinedTextField(
                 value = uiState.precio,
                 onValueChange = { viewModel.updateField(it, "precio") },
-                label = { Text("Precio (en USD)") },
+                label = { Text("Precio ") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true

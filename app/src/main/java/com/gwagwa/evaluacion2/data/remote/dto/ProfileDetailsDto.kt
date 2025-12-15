@@ -4,15 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * DTO para la respuesta del endpoint cliente-profile/me
- * que devuelve los detalles del perfil SIN el wrapper {success, data}
- * y SIN los campos de autenticación (email, role).
  */
 data class ProfileDetailsDto(
     @SerializedName("user")
-    val userId: String, // ID del usuario al que pertenece este perfil
+    val userId: String,
 
     @SerializedName("_id")
-    val profileId: String, // ID de este documento de perfil
+    val profileId: String,
 
     @SerializedName("nombre")
     val nombre: String,
@@ -37,6 +35,9 @@ data class ProfileDetailsDto(
 
     @SerializedName("__v")
     val __v: Int,
+
+    @SerializedName("documentoIdentidad")
+    val documentoIdentidad: String? = null
 
     // (por si lo necesito luego)
     // val email: String? = null

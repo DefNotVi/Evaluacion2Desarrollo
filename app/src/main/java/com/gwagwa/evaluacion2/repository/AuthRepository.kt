@@ -36,6 +36,8 @@ class AuthRepository(
                 sessionManager.saveAuthToken(token)
             }
             sessionManager.saveUserRole(data.user.role)
+            sessionManager.saveUserEmail(data.user.email)
+            sessionManager.saveUserId(data.user.id)
         }
         // Devuelve la respuesta completa al ViewModel
         return response
@@ -109,9 +111,11 @@ class AuthRepository(
                 telefono = profileDetails.telefono,
                 direccion = profileDetails.direccion,
                 profileId = profileDetails.profileId,
+                documentoIdentidad = profileDetails.documentoIdentidad,
+                preferencias = profileDetails.preferencias,
             )
         } catch (e: Exception) {
-            // Si falla la API del perfil (ej. token expirado o error 404)
+            // Si falla la API del perfil ( token expirado o error 404)
             throw IOException("Fallo al obtener los detalles del perfil desde la API: ${e.message}")
         }
     }
@@ -138,9 +142,9 @@ class AuthRepository(
 
             // Reconstruir y devolver el UserDto actualizado
             return UserDto(
-                id = userId, // De SessionManager
-                email = userEmail, // De SessionManager
-                role = userRole, // De SessionManager
+                id = userId,
+                email = userEmail,
+                role = userRole,
                 createdAt = updatedProfileDetails.createdAt,
                 isActive = updatedProfileDetails.isActive,
                 emailVerified = true,

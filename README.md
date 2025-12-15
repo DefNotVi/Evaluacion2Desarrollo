@@ -1,10 +1,12 @@
-# Evaluación 2: Aplicación Móvil con Jetpack Compose y Xano para la API
+# Examen transversal: Aplicación Móvil con Jetpack Compose, MongoAtlas y render para la API
+# TravelGO SPA
+- **Por Vicente Escobar**
 
 ## 1. Caso elegido y alcance
 
 - **Caso:** TravelGo SPA
 
-- **Alcance EP3:** Diseño/UI, validaciones, navegación, gestión de estado (local y global), persistencia de sesión y URI de avatar, recursos nativos (cámara/galería) y consumo de API con manejo de token ( /auth/me).
+- **Alcance EP3:** Diseño/UI, validaciones, navegación, gestión de estado (local y global), persistencia de sesión y URI de avatar, recursos nativos (cámara/galería) y consumo de API con manejo de token ( /auth/me), roles de Cliente y Administrador, pruebas unitarias, uso de backend (render).
 
 ## 2. Requisitos y ejecución
 
@@ -12,7 +14,7 @@
 
 - **Framework:** Android SDK (API 33+)
 
-- **Librerías:** Jetpack Compose, Kotlin Coroutines & Flow, Retrofit/OkHttp, DataStore.
+- **Librerías:** Jetpack Compose, Kotlin Coroutines & Flow, Retrofit/OkHttp, DataStore, MockK/Junit.
 
 **Instalación:**
 
@@ -56,74 +58,57 @@
 
 ## 4. Funcionalidades
 
-- **Formulario validado:** Formulario de Login/Registro, valida campos de email y password (requeridos), bloqueando el envío si no son válidos (como por ej, email inválido o contraseña vacía)
+- **Autenticación Completa:** Flujos de Login y Registro validados (email, password) con manejo de token JWT
 
-- **Navegación y backstack:** Flujo de la aplicación con transiciones suaves y gestión correcta del inicio de sesión
+- **Persistencia de Sesión:** Token JWT, ID, Email y Rol persisten en el DataStore (SessionManager)
 
-- **Gestión de estado:** Se manejan los estados de Carga (isLoading), Éxito (datos de perfil) y Error (mensajes visibles en la UI) sincronizados con la respuesta del Repository
+- **Vista de Paquetes:** Muestra la lista de paquetes turísticos obtenidos del backend apenas se  logea el cliente 
 
-- **Persistencia local (CRUD):**  Sesión: Token JWT persistido en DataStore (SessionManager)
+- **Filtros Dinámicos:** Filtrado por texto (nombre/destino) y filtrado por Categoría en la pantalla de paquetes
 
-- **Avatar:** URI de la imagen de perfil almacenada en DataStore (AvatarRepository)
+- **Perfil y Edición:** Carga y Muestra los datos del perfil (nombre, email, ID, etc). Incluye edición de campos :D
 
-- **Recursos nativos:** Integración de Cámara/Galería para seleccionar la imagen de perfil
+- **Recursos Nativos:** Uso de Cámara y/o Galería para cambiar la imagen de perfil
 
-- **Animaciones con propósito:** Transiciones y efectos de carga (progress indicators) para mejorar el feedback al usuario durante la espera.
+- **Admin:** Pantalla dedicada para usuarios con role: ADMIN con opciones para gestionar usuarios y crear paquetes
 
-- **Consumo de API** ( `/me`): Implementación del llamado al endpoint de perfil /auth/me con un AuthInterceptor para adjuntar el token de autenticación de forma automática en todas las peticiones protegidas
+- **Manejo de Errores y otras cositas:** Muestra estados de Carga visualmente, Éxito y mensajes de Error específicos (como por ej: "Error de red", "Credenciales inválidas")
 
+- **Pruebas Unitarias:** Implementadas en AuthRepository para validar la lógica de sesión y autenticación entre otros, esto debido a que allí se concentran las funciones principales
 ## 5. Endpoints
 
-**Base URL:** `https://x8ki-letl-twmt.n7.xano.io/api:Rfm_61dW`
+**Base URL:** `https://travelgo-api-1.onrender.com/api/`
 
-| Método    | Ruta          | Body                              | Respuesta
+| Método    | Ruta         			    | Body                             	       | Respuesta
 
-| ------    | ------------  | ----------------------------------| -----------------------------------
- 
-| POST      | /auth/signup  | { email, password}                | 201 {authToken, user: { id, email,…}
+| ------    | ------------  			    | ----------------------------------       | -----------------------------------
 
-| POST      | /auth/login   | { email, password }               | 200 {authToken, user: { id, email,…}
+| POST      | auth/register			    | { email, password, name}                 | 201 {authToken, user: { id, email, role...}
 
-| GET       | /auth/me      | (requiere header Authorization: Bearer ) | 200 { id, email, name, avatarUrl?,…} 
+| POST      | auth/login   			    | { email, password }                      | 200 {authToken, user: { id, email, role...}
 
-**Endpoints sin estar en una “tabla”:**
+| GET       | cliente-profile/me     		    | (requiere header Authorization: Bearer ) | 200 { _id, email, name, avatarUrl?,..} 
 
-- POST /auth/signup
+| GET	    | paquete-turístico/disponibles         | (requiere header Authorization: Bearer)  | 200 { _id, nombre, descripción...}
 
-- Body: { email, password, name}
+| PUT       | cliente-profile/me       	  	    | { nombre, teléfono, dirección...}        | 404 { message, error, statuscode} (debería poder actualizar el perfil pero no lo hace la api)
 
-- Respuesta (Ejemplo): 201 { authToken, user: { id, email,…}}
+| GET       | auth/users              		    | (requiere rol de admin y Token)          | 200 (devuelve una lista de usuarios como el cliente-profile/me)
 
-- POST /auth/login
-
-- Body: { email, password}
-
-- Respuesta (Ejemplo): 200 { authToken, user: { id, email,…}}
-
-- GET /auth/me
-
-- Requerimiento: Header Authorization: Bearer (el token)
-
-- Respuesta (Ejemplo): 200 { id, email, name, avatarUrl?} 
+| POST	    | paquete-turístico                     | { nombre, descripción, destino...}       | 201 { success, message, data}
 
 ## 6. User flows
 
-**Flujo principal (Login exitoso):**
+**Flujo principal (Login exitoso usuario):**
 
-- El usuario ingresa email y password en la pantalla de Login y presiona "Ingresar" (o puede optar por registrarse dandole a "¿No tienes cuenta? Regístrate")
+- El usuario ingresa credenciales en Login y presiona "Ingresar".
+- El "AuthRepository" llama a "POST auth/login".
+- Si es exitoso, el token, ID, Email y Rol son capturados y guardados en el "SessionManager".
+- La navegación redirige al "PackageListScreen".
+- El ViewModel carga el perfil (authRepository.getProfile()) usando el token, el cual es inyectado por el "AuthInterceptor".
 
-- El AuthRepository llama a POST /auth/login
+- **Casos de Error:**
 
-- Si es exitoso, el token es capturado y guardado en SessionManager
-
-- La navegación redirige a la pantalla de Perfil/Dashboard
-
-- El ProfileViewModel llama a fetchProfile(), el cual utiliza el token guardado a través del AuthInterceptor para obtener los datos del usuario
-
-- La pantalla de perfil muestra los datos y el avatar (si está guardado localmente)
-
-**Casos de Error:**
-
-- Error de credenciales: El LoginViewModel captura el error del API (por ej, 400 o 401) y muestra un mensaje de error en la pantalla de Login sin incluir el codigo del error
-
-- Error de red/servidor: Las peticiones de la API están envueltas en try-catch. En caso de timeout o falta de conexión, se actualiza el estado a error, mostrando un mensaje al usuario
+- **Error de Credenciales/401:** El ViewModel captura el error de la API (generalmente 400 o 401) y muestra un mensaje en la pantalla de Login ("Credenciales inválidas").
+- **Error de Red/Timeout:** Las peticiones están envueltas en "try-catch". Si hay un "IOException", se actualiza el estado a error, mostrando un mensaje al usuario (como: "Error de red al cargar el perfil").
+- **Error 404 al Guardar Perfil:** Se muestra el mensaje "Error: Fallo al guardar: Fallo al actualizar el perfil: HTTP 404" (Problema confirmado de Backend). La funcionalidad de guardado está afectada gracias al backend no funcionando bien.

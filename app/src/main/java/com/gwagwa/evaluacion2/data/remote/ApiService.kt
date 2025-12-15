@@ -41,13 +41,15 @@ interface ApiService {
     @GET("paquete-turistico/disponibles")
     suspend fun getAvailableTourPackages(): PackageResponse
 
-    // ✅ CORRECTO: "paquete-turistico" (sin /api)
-    @GET("paquete-turistico")
-    suspend fun getAllTourPackages(): List<PackageDto> // Para el endpoint que lista TODOS los paquetes
+    /* ✅ CORRECTO: "paquete-turistico" (sin /api)
+    *@GET("paquete-turistico")
+    *suspend fun getAllTourPackages(): List<PackageDto> // Para el endpoint que lista TODOS los paquetes
+    */
 
-    // ✅ CORRECTO: Endpoint para el detalle del paquete (NUEVO)
-    @GET("paquete-turistico/{id}")
-    suspend fun getTourPackageById(@Path("id") id: Int): PackageDto
+    /* ✅ CORRECTO: Endpoint para el detalle del paquete (NUEVO)
+    * @GET("paquete-turistico/{id}")
+    * suspend fun getTourPackageById(@Path("id") id: Int): PackageDto
+    **/
 
     @GET("auth/users")
     suspend fun getAllUsers(): AllUsersResponse
@@ -56,7 +58,6 @@ interface ApiService {
     // Al actualizar, espera la nueva versión del perfil (ProfileDetailsDto) como respuesta
     suspend fun updateProfile(@Body request: UpdateProfileRequest): ProfileDetailsDto
 
-    //  Endpoint para crear un nuevo paquete (POST)
     @POST("paquete-turistico")
 
     suspend fun createPackage(@Body request: CreatePackageRequest): PackageDto
