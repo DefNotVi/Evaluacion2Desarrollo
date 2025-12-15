@@ -1,6 +1,6 @@
 # Examen transversal: Aplicación Móvil con Jetpack Compose, MongoAtlas y render para la API
-[# TravelGO SPA](https://github.com/DefNotVi/Evaluacion2Desarrollo/releases/tag/0.1.0)
-[- **Por Vicente Escobar**](https://github.com/DefNotVi/Evaluacion2Desarrollo/commits/master/)
+#[TravelGO SPA](https://github.com/DefNotVi/Evaluacion2Desarrollo/releases/tag/0.1.0)
+- **[Por Vicente Escobar](https://github.com/DefNotVi/Evaluacion2Desarrollo/commits/master/)**
 
 ## 1. Caso elegido y alcance
 
@@ -75,7 +75,7 @@
 - **Manejo de Errores y otras cositas:** Muestra estados de Carga visualmente, Éxito y mensajes de Error específicos (como por ej: "Error de red", "Credenciales inválidas")
 
 - **Pruebas Unitarias:** Implementadas en AuthRepository para validar la lógica de sesión y autenticación entre otros, esto debido a que allí se concentran las funciones principales
-[## 5. Endpoints](https://github.com/DefNotVi/Evaluacion2Desarrollo/blob/master/app/src/main/java/com/gwagwa/evaluacion2/data/remote/ApiService.kt)
+- ## 5.[Endpoints](https://github.com/DefNotVi/Evaluacion2Desarrollo/blob/master/app/src/main/java/com/gwagwa/evaluacion2/data/remote/ApiService.kt)
 
 **Base URL:** `https://travelgo-api-1.onrender.com/api/`
 
