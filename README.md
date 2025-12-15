@@ -1,5 +1,5 @@
 # Examen transversal: Aplicación Móvil con Jetpack Compose, MongoAtlas y render para la API
-#[TravelGO SPA](https://github.com/DefNotVi/Evaluacion2Desarrollo/releases/tag/0.1.0)
+# [TravelGO SPA](https://github.com/DefNotVi/Evaluacion2Desarrollo/releases/tag/0.1.0)
 - **[Por Vicente Escobar](https://github.com/DefNotVi/Evaluacion2Desarrollo/commits/master/)**
 
 ## 1. Caso elegido y alcance
